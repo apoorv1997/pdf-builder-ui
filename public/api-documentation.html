@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BuyMe API Documentation</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+    h1 { color: #2563eb; margin-bottom: 10px; font-size: 28px; }
+    h2 { color: #1e40af; margin: 30px 0 15px; font-size: 20px; border-bottom: 2px solid #2563eb; padding-bottom: 5px; }
+    .subtitle { color: #666; margin-bottom: 30px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+    th { background-color: #2563eb; color: white; }
+    tr:nth-child(even) { background-color: #f8fafc; }
+    .method { font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .get { background-color: #22c55e; color: white; }
+    .post { background-color: #3b82f6; color: white; }
+    .put { background-color: #f59e0b; color: white; }
+    .delete { background-color: #ef4444; color: white; }
+    code { background-color: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; }
+    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px; }
+    @media print { body { padding: 20px; } h2 { page-break-after: avoid; } table { page-break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <h1>BuyMe Auction Platform - API Documentation</h1>
+  <p class="subtitle">Base URL: <code>http://localhost:8081</code></p>
+
+  <h2>Authentication</h2>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/api/auth/login</code></td><td>Authenticate user and return JWT token</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/api/auth/register</code></td><td>Register new user account</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/api/auth/logout</code></td><td>Invalidate user session</td></tr>
+  </table>
+
+  <h2>Auctions</h2>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/auctions</code></td><td>List auctions with optional filters (search, categoryId, minPrice, maxPrice, status, sortBy, sortOrder, page, pageSize)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/api/auctions</code></td><td>Create new auction listing</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/auctions/featured</code></td><td>Get featured/highlighted auctions</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/auctions/:id</code></td><td>Get auction details by ID</td></tr>
+    <tr><td><span class="method put">PUT</span></td><td><code>/api/auctions/:id</code></td><td>Update auction details</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td><code>/api/auctions/:id</code></td><td>Delete auction listing</td></tr>
+  </table>
+
+  <h2>Bids</h2>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/bids</code></td><td>List all bids</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/auctions/:auctionId/bids</code></td><td>Get all bids for a specific auction</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/api/auctions/:auctionId/bids</code></td><td>Place a bid on auction (supports auto-bidding)</td></tr>
+  </table>
+
+  <h2>Categories</h2>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/categories</code></td><td>Get hierarchical category tree</td></tr>
+  </table>
+
+  <h2>Users</h2>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/users</code></td><td>List all users (admin only)</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:id</code></td><td>Get user profile by ID</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:userId/alerts</code></td><td>Get user's saved alerts</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:userId/auctions</code></td><td>Get auctions created by user</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:userId/bids</code></td><td>Get bids placed by user</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:userId/orders</code></td><td>Get user's won auctions/orders</td></tr>
+  </table>
+
+  <h2>Customer Requests</h2>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/requests</code></td><td>List all customer requests (customer-rep/admin)</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/api/requests</code></td><td>Create new support request</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/requests/:id</code></td><td>Get request details by ID</td></tr>
+    <tr><td><span class="method put">PUT</span></td><td><code>/api/requests/:id</code></td><td>Update/resolve customer request</td></tr>
+  </table>
+
+  <h2>Admin</h2>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/admin/sales-report</code></td><td>Get sales analytics and reports</td></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/admin/audit-logs</code></td><td>Get system audit logs</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/api/admin/customer-reps</code></td><td>Create customer representative account</td></tr>
+  </table>
+
+  <h2>Alerts</h2>
+  <table>
+    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
+    <tr><td><span class="method get">GET</span></td><td><code>/api/alerts</code></td><td>List all alerts</td></tr>
+    <tr><td><span class="method post">POST</span></td><td><code>/api/alerts</code></td><td>Create new alert with keywords/filters</td></tr>
+    <tr><td><span class="method delete">DELETE</span></td><td><code>/api/alerts/:id</code></td><td>Delete an alert</td></tr>
+  </table>
+
+  <div class="footer">
+    <p>Generated for BuyMe Auction Platform | API Version 1.0</p>
+  </div>
+</body>
+</html>
