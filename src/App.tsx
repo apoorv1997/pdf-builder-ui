@@ -18,11 +18,14 @@ import CreateAuction from "./pages/CreateAuction";
 import CreateCustomerRep from "./pages/CreateCustomerRep";
 import CurrentBids from "./pages/CurrentBids";
 import FAQ from "./pages/FAQ";
+import HelpCenter from "./pages/HelpCenter";
 import ManageRequests from "./pages/ManageRequests";
 import MyAuctions from "./pages/MyAuctions";
+import MyRequests from "./pages/MyRequests";
 import OrderHistory from "./pages/OrderHistory";
 import Preferences from "./pages/Preferences";
 import Profile from "./pages/Profile";
+import RequestDetails from "./pages/RequestDetails";
 import SalesReport from "./pages/SalesReport";
 import NotFound from "./pages/NotFound";
 
@@ -50,11 +53,14 @@ const App = () => (
           <Route path="/create-customer-rep" element={<CreateCustomerRep />} />
           <Route path="/current-bids" element={<CurrentBids />} />
           <Route path="/faq" element={<FAQ />} />
+          <Route path="/help" element={<HelpCenter />} />
           <Route path="/manage-requests" element={<ManageRequests />} />
           <Route path="/my-auctions" element={<MyAuctions />} />
+          <Route path="/my-requests" element={<MyRequests />} />
           <Route path="/order-history" element={<OrderHistory />} />
           <Route path="/preferences" element={<Preferences />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/request/:id" element={<RequestDetails />} />
           <Route path="/sales-report" element={<SalesReport />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

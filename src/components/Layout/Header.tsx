@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Bell, User, Gavel, Menu } from 'lucide-react';
+import { Search, Bell, User, Gavel, Menu, HelpCircle } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,6 +26,7 @@ export const Header = ({ userRole, userName }: HeaderProps) => {
     ...(userRole === 'seller' ? [{ to: '/create-auction', label: 'Sell Item' }] : []),
     ...(userRole === 'customer-rep' ? [{ to: '/customer-rep', label: 'Rep Dashboard' }] : []),
     ...(userRole === 'admin' ? [{ to: '/admin', label: 'Admin Panel' }] : []),
+    { to: '/help', label: 'Help' },
   ];
 
   return (
@@ -87,7 +88,20 @@ export const Header = ({ userRole, userName }: HeaderProps) => {
                     <Link to="/dashboard">My Dashboard</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
+                    <Link to="/current-bids">Current Bids</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link to="/history">Auction History</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-requests">My Requests</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/preferences">Item Alerts</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile">Profile</Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
                     <Link to="/settings">Settings</Link>
@@ -127,12 +141,20 @@ export const Header = ({ userRole, userName }: HeaderProps) => {
                     {link.label}
                   </Link>
                 ))}
-                {!userRole && (
+                {userRole && (
                   <>
-                    <Link to="/login" className="text-lg font-medium text-foreground/80">
-                      Sign In
+                    <Link to="/my-requests" className="text-lg font-medium text-foreground/80">
+                      My Requests
+                    </Link>
+                    <Link to="/preferences" className="text-lg font-medium text-foreground/80">
+                      Item Alerts
                     </Link>
                   </>
+                )}
+                {!userRole && (
+                  <Link to="/login" className="text-lg font-medium text-foreground/80">
+                    Sign In
+                  </Link>
                 )}
               </nav>
             </SheetContent>

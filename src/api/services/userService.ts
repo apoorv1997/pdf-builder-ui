@@ -1,6 +1,6 @@
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../config';
-import { User, Alert, AuctionItem, Bid } from '@/types/auction';
+import { User, Alert, AuctionItem, Bid, CustomerRequest } from '@/types/auction';
 
 export interface LoginCredentials {
   email: string;
@@ -17,6 +17,13 @@ export interface RegisterData {
 export interface AuthResponse {
   user: User;
   token: string;
+}
+
+export interface CreateRequestData {
+  type: 'password_reset' | 'bid_removal' | 'account_issue' | 'general';
+  description: string;
+  auctionId?: string;
+  bidId?: string;
 }
 
 export const userService = {
@@ -75,5 +82,21 @@ export const userService = {
 
   async getUserOrders(userId: string): Promise<AuctionItem[]> {
     return apiClient.get<AuctionItem[]>(API_ENDPOINTS.userOrders(userId));
+  },
+
+  // Customer Requests
+  async getUserRequests(userId: string): Promise<CustomerRequest[]> {
+    return apiClient.get<CustomerRequest[]>(`/api/users/${userId}/requests`);
+  },
+
+  async createRequest(data: CreateRequestData): Promise<CustomerRequest> {
+    const user = this.getCurrentUser();
+    return apiClient.post<CustomerRequest>(API_ENDPOINTS.requests, {
+      ...data,
+      userId: user?.id,
+      userName: user?.name,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    });
   },
 };
