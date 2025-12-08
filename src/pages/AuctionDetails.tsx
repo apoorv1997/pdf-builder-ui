@@ -8,8 +8,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
-import { useAuction } from '@/hooks/useAuctions';
+import { useAuction, useAuctions } from '@/hooks/useAuctions';
 import { useToast } from '@/hooks/use-toast';
+import { AuctionCard } from '@/components/Auction/AuctionCard';
+import { userService } from '@/api';
 import { 
   Clock, 
   TrendingUp, 
@@ -25,6 +27,7 @@ import { dummyBids } from '@/data/dummyData';
 
 const AuctionDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const user = userService.getCurrentUser();
   const { data: auction, isLoading } = useAuction(id || '');
   const { toast } = useToast();
   
@@ -32,6 +35,17 @@ const AuctionDetails = () => {
   const [isAutoBid, setIsAutoBid] = useState(false);
   const [maxAutoBid, setMaxAutoBid] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch similar items based on category
+  const { data: similarData } = useAuctions({
+    categoryId: auction?.categoryId,
+    status: 'active',
+  });
+
+  // Filter out current auction and limit to 4 items
+  const similarAuctions = similarData?.auctions
+    .filter(a => a.id !== id)
+    .slice(0, 4) || [];
 
   const handlePlaceBid = async () => {
     if (!auction) return;
@@ -48,13 +62,25 @@ const AuctionDetails = () => {
       return;
     }
 
+    if (isAutoBid && maxAutoBid) {
+      const maxBid = parseFloat(maxAutoBid);
+      if (isNaN(maxBid) || maxBid < amount) {
+        toast({
+          title: 'Invalid auto-bid',
+          description: 'Maximum auto-bid must be greater than your current bid',
+          variant: 'destructive',
+        });
+        return;
+      }
+    }
+
     setIsSubmitting(true);
     
     // Simulate API call
     setTimeout(() => {
       toast({
         title: 'Bid placed successfully!',
-        description: `Your bid of $${amount.toLocaleString()} has been placed.`,
+        description: `Your bid of $${amount.toLocaleString()} has been placed.${isAutoBid ? ' Auto-bidding enabled.' : ''}`,
       });
       setBidAmount('');
       setIsSubmitting(false);
@@ -64,7 +90,7 @@ const AuctionDetails = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header userRole="buyer" userName="John Doe" />
+        <Header userRole={user?.role} userName={user?.name} />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -75,7 +101,7 @@ const AuctionDetails = () => {
   if (!auction) {
     return (
       <div className="min-h-screen bg-background">
-        <Header userRole="buyer" userName="John Doe" />
+        <Header userRole={user?.role} userName={user?.name} />
         <div className="container py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Auction not found</h1>
           <Button asChild>
@@ -91,9 +117,12 @@ const AuctionDetails = () => {
   const isEndingSoon = endTime.getTime() - Date.now() < 24 * 60 * 60 * 1000;
   const minBid = auction.currentBid + auction.bidIncrement;
 
+  // Filter bids for this auction
+  const auctionBids = dummyBids.filter(b => b.auctionId === id);
+
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole="buyer" userName="John Doe" />
+      <Header userRole={user?.role} userName={user?.name} />
 
       <div className="container py-8">
         {/* Breadcrumb */}
@@ -102,7 +131,7 @@ const AuctionDetails = () => {
           <ChevronRight className="h-4 w-4" />
           <Link to="/browse" className="hover:text-foreground transition-smooth">Browse</Link>
           <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground">{auction.title}</span>
+          <span className="text-foreground line-clamp-1">{auction.title}</span>
         </nav>
 
         <div className="grid lg:grid-cols-2 gap-8">
@@ -276,31 +305,58 @@ const AuctionDetails = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {dummyBids.map((bid) => (
-                <div key={bid.id} className="flex items-center justify-between py-3 border-b last:border-0">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                      <User className="h-4 w-4 text-muted-foreground" />
+            {auctionBids.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">No bids yet. Be the first to bid!</p>
+            ) : (
+              <div className="space-y-3">
+                {auctionBids.map((bid) => (
+                  <div key={bid.id} className="flex items-center justify-between py-3 border-b last:border-0">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{bid.bidderName}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatDistanceToNow(new Date(bid.timestamp), { addSuffix: true })}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{bid.bidderName}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatDistanceToNow(new Date(bid.timestamp), { addSuffix: true })}
-                      </p>
+                    <div className="text-right">
+                      <p className="font-semibold text-primary">${bid.amount.toLocaleString()}</p>
+                      {bid.isAutoBid && (
+                        <Badge variant="secondary" className="text-xs">Auto-bid</Badge>
+                      )}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-primary">${bid.amount.toLocaleString()}</p>
-                    {bid.isAutoBid && (
-                      <Badge variant="secondary" className="text-xs">Auto-bid</Badge>
-                    )}
-                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Similar Items */}
+        {similarAuctions.length > 0 && (
+          <section className="mt-12">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold">Similar Items</h2>
+              <Button variant="outline" asChild>
+                <Link to={`/browse?category=${auction.categoryId}`}>View More</Link>
+              </Button>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {similarAuctions.map((item, index) => (
+                <div 
+                  key={item.id} 
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <AuctionCard auction={item} />
                 </div>
               ))}
             </div>
-          </CardContent>
-        </Card>
+          </section>
+        )}
       </div>
     </div>
   );

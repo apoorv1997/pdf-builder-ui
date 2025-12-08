@@ -164,12 +164,32 @@ export const dummyAuctions: AuctionItem[] = [
     status: 'active',
     specifications: { CPU: 'AMD Ryzen 9', GPU: 'RTX 4090', RAM: '32GB', Display: '14 inch 165Hz' },
   },
+  {
+    id: '7',
+    title: 'iPhone 14 Pro - 128GB - Space Black',
+    description: 'Previous generation iPhone Pro in excellent condition.',
+    imageUrl: 'https://images.unsplash.com/photo-1678685888221-cda773a3dcdb?w=800',
+    categoryId: 'iphone',
+    categoryPath: ['Electronics', 'Smartphones', 'iPhone'],
+    sellerId: '2',
+    sellerName: 'Jane Smith',
+    startingPrice: 600,
+    currentBid: 750,
+    bidIncrement: 20,
+    minimumPrice: 650,
+    startTime: new Date('2024-01-18'),
+    endTime: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000),
+    status: 'active',
+    specifications: { Storage: '128GB', Color: 'Space Black', Condition: 'Excellent' },
+  },
 ];
 
 export const dummyBids: Bid[] = [
   { id: '1', auctionId: '1', bidderId: '1', bidderName: 'John Doe', amount: 1050, isAutoBid: false, timestamp: new Date() },
   { id: '2', auctionId: '1', bidderId: '5', bidderName: 'Mike Wilson', amount: 1025, isAutoBid: true, maxAutoBid: 1100, timestamp: new Date(Date.now() - 3600000) },
   { id: '3', auctionId: '1', bidderId: '1', bidderName: 'John Doe', amount: 1000, isAutoBid: false, timestamp: new Date(Date.now() - 7200000) },
+  { id: '4', auctionId: '2', bidderId: '1', bidderName: 'John Doe', amount: 2850, isAutoBid: false, timestamp: new Date(Date.now() - 1800000) },
+  { id: '5', auctionId: '3', bidderId: '1', bidderName: 'John Doe', amount: 300, isAutoBid: true, maxAutoBid: 350, timestamp: new Date(Date.now() - 5400000) },
 ];
 
 export const dummyAlerts: Alert[] = [
@@ -210,8 +230,10 @@ export const dummyRequests: CustomerRequest[] = [
     userName: 'John Doe',
     type: 'bid_removal',
     status: 'pending',
-    description: 'I accidentally placed a bid with wrong amount. Please help remove it.',
+    description: 'I accidentally placed a bid with wrong amount on iPhone 15 Pro Max auction. Please help remove it.',
     createdAt: new Date(Date.now() - 86400000),
+    auctionId: '1',
+    bidId: '1',
   },
   {
     id: '2',
@@ -219,14 +241,33 @@ export const dummyRequests: CustomerRequest[] = [
     userName: 'Mike Wilson',
     type: 'password_reset',
     status: 'in_progress',
-    description: 'Unable to reset password via email.',
+    description: 'Unable to reset password via email. The reset link is not being sent to my email address.',
     createdAt: new Date(Date.now() - 172800000),
     assignedRepId: '3',
   },
+  {
+    id: '3',
+    userId: '1',
+    userName: 'John Doe',
+    type: 'general',
+    status: 'resolved',
+    description: 'How do I enable auto-bidding for an auction?',
+    createdAt: new Date(Date.now() - 432000000),
+    resolvedAt: new Date(Date.now() - 345600000),
+    assignedRepId: '3',
+    resolution: 'Explained the auto-bidding feature and how to enable it on the auction page.',
+  },
 ];
+
+// Helper to get requests for a specific user
+export const getUserRequests = (userId: string): CustomerRequest[] => {
+  return dummyRequests.filter(r => r.userId === userId);
+};
 
 export const dummyAuditLogs: AuditLog[] = [
   { id: '1', userId: '4', userName: 'Admin User', action: 'CREATE_REP', details: 'Created customer rep: Sarah Johnson', timestamp: new Date(Date.now() - 604800000) },
-  { id: '2', userId: '3', userName: 'Sarah Johnson', action: 'RESOLVE_REQUEST', details: 'Resolved bid removal request #1', timestamp: new Date(Date.now() - 86400000) },
+  { id: '2', userId: '3', userName: 'Sarah Johnson', action: 'RESOLVE_REQUEST', details: 'Resolved general inquiry request #3', timestamp: new Date(Date.now() - 345600000) },
   { id: '3', userId: '2', userName: 'Jane Smith', action: 'CREATE_AUCTION', details: 'Created auction: iPhone 15 Pro Max', timestamp: new Date(Date.now() - 432000000) },
+  { id: '4', userId: '3', userName: 'Sarah Johnson', action: 'REMOVE_BID', details: 'Removed bid #123 from auction #1 per user request', timestamp: new Date(Date.now() - 259200000) },
+  { id: '5', userId: '4', userName: 'Admin User', action: 'UPDATE_USER', details: 'Updated user permissions for Mike Wilson', timestamp: new Date(Date.now() - 172800000) },
 ];

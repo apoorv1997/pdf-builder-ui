@@ -27,7 +27,7 @@ export interface AuctionItem {
   startingPrice: number;
   currentBid: number;
   bidIncrement: number;
-  minimumPrice: number;
+  minimumPrice: number; // secret reserve price
   startTime: Date;
   endTime: Date;
   status: 'active' | 'closed' | 'sold';
@@ -41,7 +41,7 @@ export interface Bid {
   bidderName: string;
   amount: number;
   isAutoBid: boolean;
-  maxAutoBid?: number;
+  maxAutoBid?: number; // secret max for auto-bidding
   timestamp: Date;
 }
 
@@ -65,16 +65,24 @@ export interface SalesReport {
   bestSellingUsers: { userId: string; userName: string; totalSales: number }[];
 }
 
+export type RequestType = 'password_reset' | 'bid_removal' | 'account_issue' | 'general';
+export type RequestStatus = 'pending' | 'in_progress' | 'resolved';
+
 export interface CustomerRequest {
   id: string;
   userId: string;
   userName: string;
-  type: 'password_reset' | 'bid_removal' | 'account_issue' | 'general';
-  status: 'pending' | 'in_progress' | 'resolved';
+  type: RequestType;
+  status: RequestStatus;
   description: string;
   createdAt: Date;
   resolvedAt?: Date;
   assignedRepId?: string;
+  // For bid removal requests
+  auctionId?: string;
+  bidId?: string;
+  // Resolution details
+  resolution?: string;
 }
 
 export interface AuditLog {
