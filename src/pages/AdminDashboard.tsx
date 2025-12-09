@@ -37,16 +37,19 @@ import {
   Loader2,
   Gavel,
   History,
-  Store
+  Store,
+  AlertCircle,
+  Inbox
 } from 'lucide-react';
 import { formatDistanceToNow, format } from 'date-fns';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const AdminDashboard = () => {
   const user = userService.getCurrentUser();
   const [selectedSeller, setSelectedSeller] = useState<string | null>(null);
 
   // Fetch all users
-  const { data: allUsers = [], isLoading: usersLoading } = useQuery<User[]>({
+  const { data: allUsers = [], isLoading: usersLoading, isError: usersError } = useQuery<User[]>({
     queryKey: ['admin', 'users'],
     queryFn: async () => {
       try {
@@ -58,7 +61,7 @@ const AdminDashboard = () => {
   });
 
   // Fetch all bids
-  const { data: allBids = [], isLoading: bidsLoading } = useQuery<Bid[]>({
+  const { data: allBids = [], isLoading: bidsLoading, isError: bidsError } = useQuery<Bid[]>({
     queryKey: ['admin', 'bids'],
     queryFn: async () => {
       try {
@@ -70,7 +73,7 @@ const AdminDashboard = () => {
   });
 
   // Fetch sales report
-  const { data: salesReport, isLoading: salesLoading } = useQuery({
+  const { data: salesReport, isLoading: salesLoading, isError: salesError } = useQuery({
     queryKey: ['salesReport'],
     queryFn: async () => {
       try {
@@ -216,8 +219,17 @@ const AdminDashboard = () => {
                     <div className="flex justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
+                  ) : usersError ? (
+                    <Alert variant="destructive" className="m-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>Failed to load buyers</AlertDescription>
+                    </Alert>
                   ) : buyers.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4">No buyers found</p>
+                    <div className="flex flex-col items-center py-8 text-muted-foreground">
+                      <Inbox className="h-10 w-10 mb-2" />
+                      <p>No buyers found</p>
+                    </div>
                   ) : (
                     <Table>
                       <TableHeader>
@@ -252,8 +264,17 @@ const AdminDashboard = () => {
                     <div className="flex justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
+                  ) : usersError ? (
+                    <Alert variant="destructive" className="m-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>Failed to load sellers</AlertDescription>
+                    </Alert>
                   ) : sellers.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4">No sellers found</p>
+                    <div className="flex flex-col items-center py-8 text-muted-foreground">
+                      <Inbox className="h-10 w-10 mb-2" />
+                      <p>No sellers found</p>
+                    </div>
                   ) : (
                     <Table>
                       <TableHeader>
@@ -293,6 +314,17 @@ const AdminDashboard = () => {
                     <div className="flex justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
+                  ) : salesError ? (
+                    <Alert variant="destructive" className="m-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>Failed to load sales data</AlertDescription>
+                    </Alert>
+                  ) : salesReport?.earningsByItemType?.length === 0 ? (
+                    <div className="flex flex-col items-center py-8 text-muted-foreground">
+                      <Inbox className="h-10 w-10 mb-2" />
+                      <p>No category data available</p>
+                    </div>
                   ) : (
                     <div className="space-y-4">
                       {salesReport?.earningsByItemType.map((item) => (
@@ -321,6 +353,17 @@ const AdminDashboard = () => {
                     <div className="flex justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
+                  ) : salesError ? (
+                    <Alert variant="destructive" className="m-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>Failed to load seller earnings</AlertDescription>
+                    </Alert>
+                  ) : salesReport?.earningsByUser?.length === 0 ? (
+                    <div className="flex flex-col items-center py-8 text-muted-foreground">
+                      <Inbox className="h-10 w-10 mb-2" />
+                      <p>No seller earnings data</p>
+                    </div>
                   ) : (
                     <div className="space-y-4">
                       {salesReport?.earningsByUser.map((user) => (
@@ -348,6 +391,17 @@ const AdminDashboard = () => {
                   {salesLoading ? (
                     <div className="flex justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                  ) : salesError ? (
+                    <Alert variant="destructive" className="m-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>Failed to load best sellers</AlertDescription>
+                    </Alert>
+                  ) : salesReport?.bestSellingItems?.length === 0 ? (
+                    <div className="flex flex-col items-center py-8 text-muted-foreground">
+                      <Inbox className="h-10 w-10 mb-2" />
+                      <p>No best selling items yet</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -379,6 +433,17 @@ const AdminDashboard = () => {
                   {salesLoading ? (
                     <div className="flex justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin" />
+                    </div>
+                  ) : salesError ? (
+                    <Alert variant="destructive" className="m-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>Failed to load top sellers</AlertDescription>
+                    </Alert>
+                  ) : salesReport?.bestSellingUsers?.length === 0 ? (
+                    <div className="flex flex-col items-center py-8 text-muted-foreground">
+                      <Inbox className="h-10 w-10 mb-2" />
+                      <p>No top sellers data</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -414,8 +479,18 @@ const AdminDashboard = () => {
                   <div className="flex justify-center py-8">
                     <Loader2 className="h-6 w-6 animate-spin" />
                   </div>
+                ) : bidsError ? (
+                  <Alert variant="destructive" className="m-4">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>Failed to load bid history</AlertDescription>
+                  </Alert>
                 ) : allBids.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-8">No bids found</p>
+                  <div className="flex flex-col items-center py-12 text-muted-foreground">
+                    <Inbox className="h-12 w-12 mb-4" />
+                    <p className="text-lg font-medium">No bids found</p>
+                    <p className="text-sm">Bid history will appear here</p>
+                  </div>
                 ) : (
                   <Table>
                     <TableHeader>
@@ -477,8 +552,17 @@ const AdminDashboard = () => {
                     <div className="flex justify-center py-8">
                       <Loader2 className="h-6 w-6 animate-spin" />
                     </div>
+                  ) : usersError ? (
+                    <Alert variant="destructive" className="m-4">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>Failed to load sellers</AlertDescription>
+                    </Alert>
                   ) : sellers.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4">No sellers found</p>
+                    <div className="flex flex-col items-center py-8 text-muted-foreground">
+                      <Inbox className="h-10 w-10 mb-2" />
+                      <p>No sellers found</p>
+                    </div>
                   ) : (
                     <div className="space-y-2">
                       {sellers.map((seller) => (

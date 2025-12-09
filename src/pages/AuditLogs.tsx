@@ -6,14 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { adminService, userService } from '@/api';
 import { dummyAuditLogs } from '@/data/dummyData';
-import { FileText, Search, Loader2 } from 'lucide-react';
+import { FileText, Search, Loader2, AlertCircle, Inbox } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { formatDistanceToNow } from 'date-fns';
 
 const AuditLogs = () => {
   const user = userService.getCurrentUser();
   const [search, setSearch] = useState('');
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError } = useQuery({
     queryKey: ['auditLogsFull'],
     queryFn: async () => {
       try {
@@ -68,8 +69,18 @@ const AuditLogs = () => {
               <div className="flex justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
+            ) : isError ? (
+              <Alert variant="destructive" className="my-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error Loading Logs</AlertTitle>
+                <AlertDescription>Failed to load audit logs. Please try again later.</AlertDescription>
+              </Alert>
             ) : filteredLogs.length === 0 ? (
-              <p className="text-muted-foreground text-center py-12">No logs found.</p>
+              <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
+                <Inbox className="h-12 w-12 mb-4" />
+                <p className="text-lg font-medium">No audit logs found</p>
+                <p className="text-sm">{search ? 'Try adjusting your search terms' : 'Activity logs will appear here'}</p>
+              </div>
             ) : (
               <div className="space-y-3">
                 {filteredLogs.map((log, index) => (

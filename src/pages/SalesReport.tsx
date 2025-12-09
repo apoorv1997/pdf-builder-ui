@@ -9,13 +9,16 @@ import {
   Package, 
   Users,
   Loader2,
-  BarChart3
+  BarChart3,
+  AlertCircle,
+  Inbox
 } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const SalesReport = () => {
   const user = userService.getCurrentUser();
 
-  const { data: report, isLoading } = useQuery({
+  const { data: report, isLoading, isError } = useQuery({
     queryKey: ['salesReportFull'],
     queryFn: async () => {
       try {
@@ -25,6 +28,21 @@ const SalesReport = () => {
       }
     },
   });
+
+  if (isError) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="container py-8">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error Loading Report</AlertTitle>
+            <AlertDescription>Failed to load sales report. Please try again later.</AlertDescription>
+          </Alert>
+        </div>
+      </div>
+    );
+  }
 
   if (isLoading) {
     return (
@@ -68,25 +86,32 @@ const SalesReport = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {report?.earningsByItemType.map((item) => {
-                  const percentage = (item.earnings / (report?.totalEarnings || 1)) * 100;
-                  return (
-                    <div key={item.category}>
-                      <div className="flex justify-between mb-1">
-                        <span className="font-medium">{item.category}</span>
-                        <span className="text-muted-foreground">${item.earnings.toLocaleString()}</span>
+              {report?.earningsByItemType?.length === 0 ? (
+                <div className="flex flex-col items-center py-8 text-muted-foreground">
+                  <Inbox className="h-10 w-10 mb-2" />
+                  <p>No category data available</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {report?.earningsByItemType.map((item) => {
+                    const percentage = (item.earnings / (report?.totalEarnings || 1)) * 100;
+                    return (
+                      <div key={item.category}>
+                        <div className="flex justify-between mb-1">
+                          <span className="font-medium">{item.category}</span>
+                          <span className="text-muted-foreground">${item.earnings.toLocaleString()}</span>
+                        </div>
+                        <div className="h-2 bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary rounded-full transition-all duration-500"
+                            style={{ width: `${percentage}%` }}
+                          />
+                        </div>
                       </div>
-                      <div className="h-2 bg-muted rounded-full overflow-hidden">
-                        <div 
-                          className="h-full bg-primary rounded-full transition-all duration-500"
-                          style={{ width: `${percentage}%` }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -99,19 +124,26 @@ const SalesReport = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                {report?.earningsByUser.map((seller, i) => (
-                  <div key={seller.userId} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
-                        {i + 1}
-                      </span>
-                      <span className="font-medium">{seller.userName}</span>
+              {report?.earningsByUser?.length === 0 ? (
+                <div className="flex flex-col items-center py-8 text-muted-foreground">
+                  <Inbox className="h-10 w-10 mb-2" />
+                  <p>No seller earnings data</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {report?.earningsByUser.map((seller, i) => (
+                    <div key={seller.userId} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-primary">
+                          {i + 1}
+                        </span>
+                        <span className="font-medium">{seller.userName}</span>
+                      </div>
+                      <span className="font-semibold text-primary">${seller.earnings.toLocaleString()}</span>
                     </div>
-                    <span className="font-semibold text-primary">${seller.earnings.toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -124,19 +156,26 @@ const SalesReport = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {report?.bestSellingItems.map((item, i) => (
-                  <div key={item.itemId} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center font-bold text-accent">
-                        {i + 1}
-                      </span>
-                      <span className="font-medium">{item.itemName}</span>
+              {report?.bestSellingItems?.length === 0 ? (
+                <div className="flex flex-col items-center py-8 text-muted-foreground">
+                  <Inbox className="h-10 w-10 mb-2" />
+                  <p>No best selling items yet</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {report?.bestSellingItems.map((item, i) => (
+                    <div key={item.itemId} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center font-bold text-accent">
+                          {i + 1}
+                        </span>
+                        <span className="font-medium">{item.itemName}</span>
+                      </div>
+                      <span className="text-muted-foreground">{item.soldCount} sold</span>
                     </div>
-                    <span className="text-muted-foreground">{item.soldCount} sold</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -149,19 +188,26 @@ const SalesReport = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {report?.bestSellingUsers.map((seller, i) => (
-                  <div key={seller.userId} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                    <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center font-bold text-success">
-                        {i + 1}
-                      </span>
-                      <span className="font-medium">{seller.userName}</span>
+              {report?.bestSellingUsers?.length === 0 ? (
+                <div className="flex flex-col items-center py-8 text-muted-foreground">
+                  <Inbox className="h-10 w-10 mb-2" />
+                  <p>No top sellers data</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {report?.bestSellingUsers.map((seller, i) => (
+                    <div key={seller.userId} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-full bg-success/10 flex items-center justify-center font-bold text-success">
+                          {i + 1}
+                        </span>
+                        <span className="font-medium">{seller.userName}</span>
+                      </div>
+                      <span className="text-muted-foreground">{seller.totalSales} sales</span>
                     </div>
-                    <span className="text-muted-foreground">{seller.totalSales} sales</span>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
