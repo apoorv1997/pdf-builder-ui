@@ -33,6 +33,8 @@ export const API_ENDPOINTS = {
   salesReport: '/api/admin/sales-report',
   auditLogs: '/api/admin/audit-logs',
   createCustomerRep: '/api/admin/customer-reps',
+  allUsers: '/api/admin/users',
+  allBids: '/api/admin/bids',
   
   // User History
   userAuctions: (userId: string) => `/api/users/${userId}/auctions`,

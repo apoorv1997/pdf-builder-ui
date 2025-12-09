@@ -1,6 +1,6 @@
 import { apiClient } from '../client';
 import { API_ENDPOINTS } from '../config';
-import { SalesReport, CustomerRequest, AuditLog, User } from '@/types/auction';
+import { SalesReport, CustomerRequest, AuditLog, User, Bid, AuctionItem } from '@/types/auction';
 
 export interface CreateCustomerRepData {
   email: string;
@@ -39,5 +39,17 @@ export const adminService = {
       resolvedAt: new Date().toISOString(),
       resolution,
     });
+  },
+
+  async getAllUsers(): Promise<User[]> {
+    return apiClient.get<User[]>(API_ENDPOINTS.allUsers);
+  },
+
+  async getAllBids(): Promise<Bid[]> {
+    return apiClient.get<Bid[]>(API_ENDPOINTS.allBids);
+  },
+
+  async getSellerAuctions(sellerId: string): Promise<AuctionItem[]> {
+    return apiClient.get<AuctionItem[]>(API_ENDPOINTS.userAuctions(sellerId));
   },
 };
