@@ -179,12 +179,12 @@ const AuctionDetails = () => {
               />
               <Badge 
                 className={`absolute top-4 right-4 ${
-                  auction.status === 'active' 
+                  auction.status.toLowerCase() === 'active' 
                     ? 'bg-success text-success-foreground' 
                     : 'bg-muted text-muted-foreground'
                 }`}
               >
-                {auction.status === 'active' ? 'Live Auction' : 'Closed'}
+                {auction.status.toLowerCase() === 'active' ? 'Live Auction' : 'Closed'}
               </Badge>
             </div>
           </div>
