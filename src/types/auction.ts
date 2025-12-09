@@ -22,6 +22,7 @@ export interface AuctionItem {
   imageUrl: string;
   categoryId: number;
   categoryName: string;
+  categoryPath: string[];
   sellerId: number;
   sellerName: string;
   startingPrice: number;

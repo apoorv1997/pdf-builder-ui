@@ -107,6 +107,7 @@ const CreateAuction = () => {
         imageUrl: formData.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
         categoryId: categoryIdNum,
         categoryName: selectedCategory?.name.split(' > ').pop() || 'Electronics',
+        categoryPath: selectedCategory?.path || ['Electronics'],
         sellerId: parseInt(user?.id || '1', 10),
         sellerName: user?.name || 'Unknown Seller',
         startingPrice,
