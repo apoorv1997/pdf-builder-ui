@@ -35,14 +35,20 @@ const CreateAuction = () => {
   });
   const [endDate, setEndDate] = useState<Date>(addDays(new Date(), 7));
 
-  const allCategories = categories?.[0]?.children?.flatMap(cat => [
-    { id: cat.id, name: cat.name, path: [categories[0].name, cat.name] },
-    ...(cat.children?.map(sub => ({ 
-      id: sub.id, 
-      name: `${cat.name} > ${sub.name}`,
-      path: [categories[0].name, cat.name, sub.name]
-    })) || [])
-  ]) || [];
+  // Flatten categories for dropdown
+  const flattenCategories = (cats: typeof categories, parentPath: string[] = []): { id: string; name: string; path: string[] }[] => {
+    if (!cats) return [];
+    return cats.flatMap(cat => {
+      const currentPath = [...parentPath, cat.name];
+      const displayName = parentPath.length > 0 ? `${parentPath.join(' > ')} > ${cat.name}` : cat.name;
+      return [
+        { id: cat.id, name: displayName, path: currentPath },
+        ...flattenCategories(cat.children, currentPath)
+      ];
+    });
+  };
+  
+  const allCategories = flattenCategories(categories);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
