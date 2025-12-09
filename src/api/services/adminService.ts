@@ -21,7 +21,7 @@ export const adminService = {
     return apiClient.post<User>(API_ENDPOINTS.createCustomerRep, { ...data, role: 'customer-rep' });
   },
 
-  async getRequests(params?: { status?: string; page?: number; pageSize?: number }): Promise<{ requests: CustomerRequest[]; total: number }> {
+  async getRequests(params?: { status?: string; assignedRepId?: string; page?: number; pageSize?: number }): Promise<{ requests: CustomerRequest[]; total: number }> {
     return apiClient.get<{ requests: CustomerRequest[]; total: number }>(API_ENDPOINTS.requests, params);
   },
 
