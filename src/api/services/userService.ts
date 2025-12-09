@@ -49,7 +49,14 @@ export const userService = {
 
   getCurrentUser(): User | null {
     const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    if (!userStr || userStr === 'undefined' || userStr === 'null') {
+      return null;
+    }
+    try {
+      return JSON.parse(userStr);
+    } catch {
+      return null;
+    }
   },
 
   async getUserById(id: string): Promise<User> {
