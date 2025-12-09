@@ -27,14 +27,14 @@ export const AuctionCard = ({ auction }: AuctionCardProps) => {
           />
           <Badge 
             className={`absolute top-3 right-3 ${
-              auction.status === 'active' 
+              auction.status.toLowerCase() === 'active' 
                 ? 'bg-success text-success-foreground' 
                 : 'bg-muted text-muted-foreground'
             }`}
           >
-            {auction.status === 'active' ? 'Live' : 'Closed'}
+            {auction.status.toLowerCase() === 'active' ? 'Live' : 'Closed'}
           </Badge>
-          {isEndingSoon && auction.status === 'active' && (
+          {isEndingSoon && auction.status.toLowerCase() === 'active' && (
             <Badge className="absolute top-3 left-3 bg-accent text-accent-foreground animate-pulse-glow">
               Ending Soon!
             </Badge>
