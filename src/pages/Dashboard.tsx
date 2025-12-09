@@ -14,16 +14,25 @@ import {
 } from 'lucide-react';
 import { useFeaturedAuctions } from '@/hooks/useAuctions';
 import { userService } from '@/api';
+import { useQuery } from '@tanstack/react-query';
 
 const Dashboard = () => {
   const user = userService.getCurrentUser();
   const { data: auctions } = useFeaturedAuctions();
 
+  const { data: userBids } = useQuery({
+    queryKey: ['userBids', user?.id],
+    queryFn: () => userService.getUserBids(user!.id),
+    enabled: !!user?.id,
+  });
+
+  const activeBidsCount = userBids?.length ?? 0;
+
   const stats = [
-    { label: 'Active Bids', value: '5', icon: TrendingUp, color: 'text-primary' },
-    { label: 'Watching', value: '12', icon: Bell, color: 'text-accent' },
-    { label: 'Won Auctions', value: '3', icon: Gavel, color: 'text-success' },
-    { label: 'Ending Soon', value: '2', icon: Clock, color: 'text-destructive' },
+    { label: 'Active Bids', value: String(activeBidsCount), icon: TrendingUp, color: 'text-primary' },
+    { label: 'Watching', value: '0', icon: Bell, color: 'text-accent' },
+    { label: 'Won Auctions', value: '0', icon: Gavel, color: 'text-success' },
+    { label: 'Ending Soon', value: '0', icon: Clock, color: 'text-destructive' },
   ];
 
   const quickActions = [
