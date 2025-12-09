@@ -21,7 +21,8 @@ export interface AuthResponse {
 
 export interface CreateRequestData {
   type: 'password_reset' | 'bid_removal' | 'account_issue' | 'general';
-  description: string;
+  subject: string;
+  message: string;
   auctionId?: string;
   bidId?: string;
 }
@@ -97,13 +98,12 @@ export const userService = {
   },
 
   async createRequest(data: CreateRequestData): Promise<CustomerRequest> {
-    const user = this.getCurrentUser();
     return apiClient.post<CustomerRequest>(API_ENDPOINTS.requests, {
-      ...data,
-      userId: user?.id,
-      userName: user?.name,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
+      type: data.type,
+      subject: data.subject,
+      message: data.message,
+      ...(data.auctionId && { auctionId: data.auctionId }),
+      ...(data.bidId && { bidId: data.bidId }),
     });
   },
 };
