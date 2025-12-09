@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Header } from '@/components/Layout/Header';
 import { AuctionCard } from '@/components/Auction/AuctionCard';
 import { Button } from '@/components/ui/button';
@@ -12,10 +13,19 @@ import { useAuctions, useCategories } from '@/hooks/useAuctions';
 import { SlidersHorizontal, Loader2, Search } from 'lucide-react';
 
 const Browse = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [priceRange, setPriceRange] = useState([0, 5000]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState<'endTime' | 'currentBid' | 'createdAt'>('endTime');
+
+  // Sync search query from URL params
+  useEffect(() => {
+    const q = searchParams.get('q');
+    if (q) {
+      setSearchQuery(q);
+    }
+  }, [searchParams]);
 
   const { data: categories } = useCategories();
   const { data: auctionsData, isLoading } = useAuctions({
