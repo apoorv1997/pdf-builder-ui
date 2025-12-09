@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Header } from '@/components/Layout/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { 
   Gavel, 
   TrendingUp, 
@@ -10,21 +11,47 @@ import {
   Settings, 
   History,
   Plus,
-  ArrowRight
+  ArrowRight,
+  Trophy,
+  AlertTriangle
 } from 'lucide-react';
-import { useFeaturedAuctions } from '@/hooks/useAuctions';
-import { userService } from '@/api';
+import { useAuctions } from '@/hooks/useAuctions';
+import { userService, auctionService } from '@/api';
 import { useQuery } from '@tanstack/react-query';
+import { Bid, AuctionItem } from '@/types/auction';
+import { useMemo } from 'react';
+
+interface BidWithAuction extends Bid {
+  auction?: AuctionItem;
+  isWinning: boolean;
+}
 
 const Dashboard = () => {
   const user = userService.getCurrentUser();
-  const { data: auctions } = useFeaturedAuctions();
 
   const { data: userBids } = useQuery({
     queryKey: ['userBids', user?.id],
     queryFn: () => userService.getUserBids(user!.id),
     enabled: !!user?.id,
   });
+
+  const { data: auctionsData } = useAuctions();
+
+  // Combine bids with auction data and determine winning status
+  const bidsWithStatus = useMemo(() => {
+    if (!userBids || !auctionsData?.auctions) return { winning: [], outbid: [] };
+
+    const enrichedBids: BidWithAuction[] = userBids.map((bid) => {
+      const auction = auctionsData.auctions.find((a) => String(a.id) === String(bid.auctionId));
+      const isWinning = auction ? bid.amount >= auction.currentBid : false;
+      return { ...bid, auction, isWinning };
+    });
+
+    const winning = enrichedBids.filter((b) => b.isWinning && b.auction);
+    const outbid = enrichedBids.filter((b) => !b.isWinning && b.auction);
+
+    return { winning, outbid };
+  }, [userBids, auctionsData]);
 
   const activeBidsCount = userBids?.length ?? 0;
 
@@ -45,6 +72,40 @@ const Dashboard = () => {
   if (user?.role === 'seller') {
     quickActions.unshift({ label: 'Create Auction', to: '/create-auction', icon: Plus });
   }
+
+  const renderBidItem = (bid: BidWithAuction) => {
+    if (!bid.auction) return null;
+    
+    return (
+      <div 
+        key={bid.id} 
+        className="flex items-center gap-4 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-smooth"
+      >
+        <img 
+          src={bid.auction.imageUrl} 
+          alt={bid.auction.title}
+          className="w-16 h-16 rounded-lg object-cover"
+        />
+        <div className="flex-1 min-w-0">
+          <Link 
+            to={`/auction/${bid.auction.id}`}
+            className="font-medium hover:text-primary transition-smooth line-clamp-1"
+          >
+            {bid.auction.title}
+          </Link>
+          <p className="text-sm text-muted-foreground">
+            Your bid: ${bid.amount.toLocaleString()}
+          </p>
+        </div>
+        <div className="text-right">
+          <p className="font-semibold text-primary">
+            ${bid.auction.currentBid.toLocaleString()}
+          </p>
+          <p className="text-xs text-muted-foreground">Current</p>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -104,45 +165,49 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          {/* Recent Activity */}
+          {/* Current Bids - Winning & Outbid */}
           <Card className="shadow-card lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Your Recent Bids</CardTitle>
+              <CardTitle>Your Current Bids</CardTitle>
               <Button variant="outline" size="sm" asChild>
                 <Link to="/current-bids">View All</Link>
               </Button>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {auctions?.slice(0, 3).map((auction) => (
-                  <div 
-                    key={auction.id} 
-                    className="flex items-center gap-4 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-smooth"
-                  >
-                    <img 
-                      src={auction.imageUrl} 
-                      alt={auction.title}
-                      className="w-16 h-16 rounded-lg object-cover"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <Link 
-                        to={`/auction/${auction.id}`}
-                        className="font-medium hover:text-primary transition-smooth line-clamp-1"
-                      >
-                        {auction.title}
-                      </Link>
-                      <p className="text-sm text-muted-foreground">
-                        Your bid: ${(auction.currentBid - 50).toLocaleString()}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-primary">
-                        ${auction.currentBid.toLocaleString()}
-                      </p>
-                      <p className="text-xs text-muted-foreground">Current</p>
-                    </div>
+            <CardContent className="space-y-6">
+              {/* Winning Bids */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <Trophy className="h-4 w-4 text-success" />
+                  <h3 className="font-semibold text-success">Winning Bids</h3>
+                  <Badge variant="secondary" className="bg-success/10 text-success">
+                    {bidsWithStatus.winning.length}
+                  </Badge>
+                </div>
+                {bidsWithStatus.winning.length > 0 ? (
+                  <div className="space-y-3">
+                    {bidsWithStatus.winning.slice(0, 2).map(renderBidItem)}
                   </div>
-                ))}
+                ) : (
+                  <p className="text-sm text-muted-foreground py-2">No winning bids yet</p>
+                )}
+              </div>
+
+              {/* Outbid */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <AlertTriangle className="h-4 w-4 text-destructive" />
+                  <h3 className="font-semibold text-destructive">Outbid</h3>
+                  <Badge variant="secondary" className="bg-destructive/10 text-destructive">
+                    {bidsWithStatus.outbid.length}
+                  </Badge>
+                </div>
+                {bidsWithStatus.outbid.length > 0 ? (
+                  <div className="space-y-3">
+                    {bidsWithStatus.outbid.slice(0, 2).map(renderBidItem)}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground py-2">No outbid items</p>
+                )}
               </div>
             </CardContent>
           </Card>
