@@ -36,10 +36,13 @@ const Browse = () => {
     sortBy,
   });
 
-  const allSubcategories = categories?.[0]?.children?.flatMap(cat => [
-    { id: cat.id, name: cat.name },
-    ...(cat.children?.map(sub => ({ id: sub.id, name: `${cat.name} > ${sub.name}` })) || [])
-  ]) || [];
+  const allCategories = categories?.[0] ? [
+    { id: categories[0].id, name: categories[0].name },
+    ...(categories[0].children?.flatMap(cat => [
+      { id: cat.id, name: cat.name },
+      ...(cat.children?.map(sub => ({ id: sub.id, name: `${cat.name} > ${sub.name}` })) || [])
+    ]) || [])
+  ] : [];
 
   const toggleCategory = (categoryId: number) => {
     setSelectedCategories(prev =>
@@ -104,7 +107,7 @@ const Browse = () => {
                 <div className="space-y-3">
                   <Label>Categories</Label>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {allSubcategories.map((category) => (
+                    {allCategories.map((category) => (
                       <div key={category.id} className="flex items-center space-x-2">
                         <Checkbox
                           id={`cat-${category.id}`}
