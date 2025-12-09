@@ -90,7 +90,7 @@ const AdminDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole="admin" userName={user?.name} />
+      <Header />
 
       <div className="container py-8">
         <div className="mb-8">

@@ -39,7 +39,7 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole={user?.role} userName={user?.name} />
+      <Header />
 
       <div className="container py-8">
         <div className="mb-8">

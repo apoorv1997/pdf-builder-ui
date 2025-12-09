@@ -48,7 +48,7 @@ const MyRequests = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole={user?.role} userName={user?.name} />
+      <Header />
 
       <div className="container py-8 max-w-3xl">
         <div className="flex items-center justify-between mb-8">

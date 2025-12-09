@@ -60,7 +60,7 @@ const CreateCustomerRep = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole="admin" userName={user?.name} />
+      <Header />
 
       <div className="container py-8 max-w-lg">
         <Card className="shadow-card">

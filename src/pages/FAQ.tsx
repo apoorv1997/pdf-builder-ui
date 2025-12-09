@@ -16,7 +16,7 @@ const FAQ = () => {
   const user = userService.getCurrentUser();
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole={user?.role} userName={user?.name} />
+      <Header />
       <div className="container py-8 max-w-3xl">
         <h1 className="text-4xl font-bold mb-2">FAQ</h1>
         <p className="text-muted-foreground mb-8">Frequently asked questions</p>

@@ -39,7 +39,7 @@ const AuditLogs = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole="admin" userName={user?.name} />
+      <Header />
 
       <div className="container py-8">
         <h1 className="text-4xl font-bold mb-2">Audit Logs</h1>

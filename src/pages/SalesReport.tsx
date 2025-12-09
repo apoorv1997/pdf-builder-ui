@@ -29,7 +29,7 @@ const SalesReport = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header userRole="admin" userName={user?.name} />
+        <Header />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -39,7 +39,7 @@ const SalesReport = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole="admin" userName={user?.name} />
+      <Header />
 
       <div className="container py-8">
         <h1 className="text-4xl font-bold mb-2">Sales Report</h1>
