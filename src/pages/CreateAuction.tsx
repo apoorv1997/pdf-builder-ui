@@ -153,7 +153,9 @@ const CreateAuction = () => {
                   onValueChange={(v) => setFormData({ ...formData, categoryId: v })}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
+                    <SelectValue placeholder="Select a category">
+                      {formData.categoryId && allCategories.find(c => c.id === formData.categoryId)?.name}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {allCategories.map((cat) => (
