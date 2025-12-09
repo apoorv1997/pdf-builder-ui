@@ -5,8 +5,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { Gavel, Loader2, Mail, Lock, User } from 'lucide-react';
+import { Gavel, Loader2, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import { userService } from '@/api';
 
 const Register = () => {
@@ -16,18 +17,21 @@ const Register = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [role, setRole] = useState<'buyer' | 'seller'>('buyer');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (password !== confirmPassword) {
-      toast({
-        title: 'Passwords do not match',
-        description: 'Please make sure both passwords are the same.',
-        variant: 'destructive',
-      });
+      setError('Passwords do not match. Please make sure both passwords are the same.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long.');
       return;
     }
 
@@ -37,22 +41,12 @@ const Register = () => {
       await userService.register({ name, email, password, role });
       toast({
         title: 'Account created!',
-        description: 'Welcome to BuyMe. Start exploring auctions!',
+        description: 'Please log in with your credentials.',
       });
-      navigate('/dashboard');
-    } catch (error) {
-      // Fallback for demo without backend
-      localStorage.setItem('user', JSON.stringify({ 
-        id: '1', 
-        email, 
-        name, 
-        role 
-      }));
-      toast({
-        title: 'Demo Mode',
-        description: 'Account created in demo mode (API not available).',
-      });
-      navigate('/dashboard');
+      navigate('/login');
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Registration failed. Please try again.';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -70,6 +64,12 @@ const Register = () => {
           <CardDescription>Join the premier electronics auction platform</CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
