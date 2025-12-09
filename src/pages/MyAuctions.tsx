@@ -24,8 +24,8 @@ const MyAuctions = () => {
     enabled: !!user?.id,
   });
 
-  const activeAuctions = auctions?.filter(a => a.status === 'active') || [];
-  const closedAuctions = auctions?.filter(a => a.status !== 'active') || [];
+  const activeAuctions = auctions?.filter(a => a.status.toLowerCase() === 'active') || [];
+  const closedAuctions = auctions?.filter(a => a.status.toLowerCase() !== 'active') || [];
 
   return (
     <div className="min-h-screen bg-background">
