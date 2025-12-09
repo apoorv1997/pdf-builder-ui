@@ -14,6 +14,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useAuth } from '@/contexts/AuthContext';
+import { isCustomerRepRole } from '@/types/auction';
 
 export const Header = () => {
   const { user, logout } = useAuth();
@@ -39,9 +40,9 @@ export const Header = () => {
   const navLinks = [
     { to: '/browse', label: 'Browse' },
     ...(userRole ? [{ to: '/dashboard', label: 'Dashboard' }] : []),
-    ...(userRole === 'seller' ? [{ to: '/create-auction', label: 'Sell Item' }] : []),
-    ...(userRole === 'customer-rep' ? [{ to: '/customer-rep', label: 'Rep Dashboard' }] : []),
-    ...(userRole === 'admin' ? [{ to: '/admin', label: 'Admin Panel' }] : []),
+    ...(userRole?.toLowerCase() === 'seller' ? [{ to: '/create-auction', label: 'Sell Item' }] : []),
+    ...(isCustomerRepRole(userRole) ? [{ to: '/customer-rep', label: 'Rep Dashboard' }] : []),
+    ...(userRole?.toLowerCase() === 'admin' ? [{ to: '/admin', label: 'Admin Panel' }] : []),
     { to: '/help', label: 'Help' },
   ];
 

@@ -1,4 +1,11 @@
-export type UserRole = 'buyer' | 'seller' | 'customer-rep' | 'admin';
+export type UserRole = 'buyer' | 'seller' | 'customer-rep' | 'customer_rep' | 'admin';
+
+// Helper to check if role is customer rep (case-insensitive, supports both formats)
+export const isCustomerRepRole = (role?: string): boolean => {
+  if (!role) return false;
+  const normalized = role.toLowerCase().replace('-', '_');
+  return normalized === 'customer_rep';
+};
 
 export interface User {
   id: string;
