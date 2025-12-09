@@ -5,6 +5,7 @@ export const API_ENDPOINTS = {
   auctions: '/api/auctions',
   auctionById: (id: string) => `/api/auctions/${id}`,
   featuredAuctions: '/api/auctions/featured',
+  searchAuctions: '/api/auctions/search',
   
   // Categories
   categories: '/api/categories',
