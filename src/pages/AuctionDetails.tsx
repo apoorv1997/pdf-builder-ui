@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Header } from '@/components/Layout/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,7 +12,8 @@ import { Separator } from '@/components/ui/separator';
 import { useAuction, useAuctions } from '@/hooks/useAuctions';
 import { useToast } from '@/hooks/use-toast';
 import { AuctionCard } from '@/components/Auction/AuctionCard';
-import { userService } from '@/api';
+import { userService, auctionService } from '@/api';
+import { Bid } from '@/types/auction';
 import { 
   Clock, 
   TrendingUp, 
@@ -27,6 +29,7 @@ import { dummyBids } from '@/data/dummyData';
 
 const AuctionDetails = () => {
   const { id } = useParams<{ id: string }>();
+  const queryClient = useQueryClient();
   const user = userService.getCurrentUser();
   const { data: auction, isLoading } = useAuction(id || '');
   const { toast } = useToast();
@@ -35,6 +38,20 @@ const AuctionDetails = () => {
   const [isAutoBid, setIsAutoBid] = useState(false);
   const [maxAutoBid, setMaxAutoBid] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch bids for this auction
+  const { data: auctionBids = [] } = useQuery<Bid[]>({
+    queryKey: ['bids', id],
+    queryFn: async () => {
+      try {
+        return await auctionService.getBidsByAuction(id || '');
+      } catch (error) {
+        console.warn('API unavailable, using dummy data:', error);
+        return dummyBids.filter(b => b.auctionId === id);
+      }
+    },
+    enabled: !!id,
+  });
 
   // Fetch similar items based on category
   const { data: similarData } = useAuctions({
@@ -48,7 +65,7 @@ const AuctionDetails = () => {
     .slice(0, 4) || [];
 
   const handlePlaceBid = async () => {
-    if (!auction) return;
+    if (!auction || !id) return;
     
     const amount = parseFloat(bidAmount);
     const minBid = auction.currentBid + auction.bidIncrement;
@@ -76,15 +93,34 @@ const AuctionDetails = () => {
 
     setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      await auctionService.placeBid(id, {
+        amount,
+        isAutoBid,
+        maxAutoBid: isAutoBid ? parseFloat(maxAutoBid) : undefined,
+      });
+      
+      // Invalidate queries to refetch updated data
+      await queryClient.invalidateQueries({ queryKey: ['bids', id] });
+      await queryClient.invalidateQueries({ queryKey: ['auction', id] });
+      
       toast({
         title: 'Bid placed successfully!',
         description: `Your bid of $${amount.toLocaleString()} has been placed.${isAutoBid ? ' Auto-bidding enabled.' : ''}`,
       });
       setBidAmount('');
+      setMaxAutoBid('');
+      setIsAutoBid(false);
+    } catch (error) {
+      console.error('Failed to place bid:', error);
+      toast({
+        title: 'Bid failed',
+        description: 'Failed to place bid. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
       setIsSubmitting(false);
-    }, 1000);
+    }
   };
 
   if (isLoading) {
@@ -117,8 +153,6 @@ const AuctionDetails = () => {
   const isEndingSoon = endTime.getTime() - Date.now() < 24 * 60 * 60 * 1000;
   const minBid = auction.currentBid + auction.bidIncrement;
 
-  // Filter bids for this auction
-  const auctionBids = dummyBids.filter(b => b.auctionId === id);
 
   return (
     <div className="min-h-screen bg-background">
