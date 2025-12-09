@@ -16,7 +16,8 @@ import { z } from 'zod';
 
 const requestSchema = z.object({
   type: z.enum(['password_reset', 'bid_removal', 'account_issue', 'general']),
-  description: z.string().min(10, 'Description must be at least 10 characters').max(1000, 'Description must be less than 1000 characters'),
+  subject: z.string().min(3, 'Subject must be at least 3 characters').max(200, 'Subject must be less than 200 characters'),
+  message: z.string().min(10, 'Message must be at least 10 characters').max(1000, 'Message must be less than 1000 characters'),
   auctionId: z.string().optional(),
 });
 
@@ -29,7 +30,8 @@ const HelpCenter = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     type: '' as RequestType | '',
-    description: '',
+    subject: '',
+    message: '',
     auctionId: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -66,7 +68,8 @@ const HelpCenter = () => {
     try {
       await userService.createRequest({
         type: formData.type as RequestType,
-        description: formData.description.trim(),
+        subject: formData.subject.trim(),
+        message: formData.message.trim(),
         auctionId: formData.auctionId || undefined,
       });
 
@@ -195,30 +198,45 @@ const HelpCenter = () => {
                 )}
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description *</Label>
+                  <Label htmlFor="subject">Subject *</Label>
+                  <Input
+                    id="subject"
+                    value={formData.subject}
+                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                    placeholder="Brief summary of your issue..."
+                    className={errors.subject ? 'border-destructive' : ''}
+                    maxLength={200}
+                  />
+                  {errors.subject && (
+                    <p className="text-xs text-destructive">{errors.subject}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="message">Message *</Label>
                   <Textarea
-                    id="description"
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    id="message"
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                     placeholder="Please describe your issue or question in detail..."
                     rows={5}
-                    className={errors.description ? 'border-destructive' : ''}
+                    className={errors.message ? 'border-destructive' : ''}
                     maxLength={1000}
                   />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    {errors.description ? (
-                      <p className="text-destructive">{errors.description}</p>
+                    {errors.message ? (
+                      <p className="text-destructive">{errors.message}</p>
                     ) : (
                       <p>Minimum 10 characters</p>
                     )}
-                    <p>{formData.description.length}/1000</p>
+                    <p>{formData.message.length}/1000</p>
                   </div>
                 </div>
 
                 <Button 
                   type="submit" 
                   className="w-full" 
-                  disabled={isLoading || !formData.type || !formData.description}
+                  disabled={isLoading || !formData.type || !formData.subject || !formData.message}
                 >
                   {isLoading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
