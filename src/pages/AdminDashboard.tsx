@@ -632,8 +632,8 @@ const AdminDashboard = () => {
                                 </TableCell>
                                 <TableCell>
                                   <Badge 
-                                    variant={auction.status === 'active' ? 'default' : 'secondary'}
-                                    className={auction.status === 'active' ? 'bg-success' : ''}
+                                    variant={auction.status.toLowerCase() === 'active' ? 'default' : 'secondary'}
+                                    className={auction.status.toLowerCase() === 'active' ? 'bg-success' : ''}
                                   >
                                     {auction.status}
                                   </Badge>
