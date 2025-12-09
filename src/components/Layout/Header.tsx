@@ -1,4 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Search, Bell, User, Gavel, Menu, LogOut } from 'lucide-react';
@@ -17,6 +18,15 @@ import { useAuth } from '@/contexts/AuthContext';
 export const Header = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/browse?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
   
   const userRole = user?.role;
   const userName = user?.name;
@@ -57,12 +67,20 @@ export const Header = () => {
           </nav>
         </div>
 
-        <div className="hidden md:flex items-center gap-4 flex-1 max-w-md mx-4">
+        <form onSubmit={handleSearch} className="hidden md:flex items-center gap-2 flex-1 max-w-md mx-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input placeholder="Search auctions..." className="pl-10" />
+            <Input 
+              placeholder="Search auctions..." 
+              className="pl-10" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-        </div>
+          <Button type="submit" size="sm">
+            Search
+          </Button>
+        </form>
 
         <div className="flex items-center gap-2">
           {userRole ? (
