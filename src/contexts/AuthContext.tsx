@@ -39,17 +39,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       await userService.login({ email, password });
-      refreshUser();
     } catch (error) {
       // Fallback for demo without backend
-      localStorage.setItem('user', JSON.stringify({ 
+      const demoUser = { 
         id: '1', 
         email, 
         name: 'Demo User', 
-        role: 'buyer' 
-      }));
-      refreshUser();
+        role: 'buyer' as const
+      };
+      localStorage.setItem('user', JSON.stringify(demoUser));
     }
+    // Always refresh after login attempt - set state directly for immediate update
+    const currentUser = userService.getCurrentUser();
+    setUser(currentUser);
   };
 
   const logout = () => {
