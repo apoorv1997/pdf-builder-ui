@@ -89,6 +89,17 @@ const CreateAuction = () => {
 
     const selectedCategory = allCategories.find(c => c.id === categoryIdNum);
     
+    const specs = formData.specifications?.trim() 
+      ? Object.fromEntries(
+          formData.specifications.split('\n')
+            .filter(line => line.includes(':'))
+            .map(line => {
+              const [key, value] = line.split(':').map(s => s.trim());
+              return [key, value];
+            })
+        )
+      : undefined;
+    
     try {
       await auctionService.createAuction({
         title: formData.title,
@@ -96,19 +107,14 @@ const CreateAuction = () => {
         imageUrl: formData.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
         categoryId: categoryIdNum,
         categoryName: selectedCategory?.name.split(' > ').pop() || 'Electronics',
-        sellerId: user?.id || '1',
+        sellerId: parseInt(user?.id || '1', 10),
         sellerName: user?.name || 'Unknown Seller',
         startingPrice,
         bidIncrement,
         minimumPrice,
         startTime: new Date(),
         endTime: endDate,
-        specifications: formData.specifications 
-          ? Object.fromEntries(formData.specifications.split('\n').map(line => {
-              const [key, value] = line.split(':').map(s => s.trim());
-              return [key, value];
-            }))
-          : undefined,
+        specifications: specs && Object.keys(specs).length > 0 ? specs : undefined,
       });
 
       toast({

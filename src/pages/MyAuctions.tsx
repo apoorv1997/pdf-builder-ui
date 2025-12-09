@@ -18,7 +18,7 @@ const MyAuctions = () => {
       try {
         return await userService.getUserAuctions(user?.id || '');
       } catch {
-        return dummyAuctions.filter(a => a.sellerId === '2');
+        return dummyAuctions.filter(a => a.sellerId === 2);
       }
     },
     enabled: !!user?.id,
