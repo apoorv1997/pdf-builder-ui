@@ -152,20 +152,27 @@ const Browse = () => {
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="h-8 w-8 animate-spin text-primary" />
               </div>
-            ) : auctionsData?.auctions.length === 0 ? (
+            ) : !auctionsData?.auctions || auctionsData.auctions.length === 0 ? (
               <Card className="shadow-card">
                 <CardContent className="py-12 text-center">
-                  <p className="text-muted-foreground">No auctions found matching your criteria.</p>
-                  <Button 
-                    variant="link" 
-                    onClick={() => {
-                      setSearchQuery('');
-                      setPriceRange([0, 5000]);
-                      setSelectedCategories([]);
-                    }}
-                  >
-                    Clear all filters
-                  </Button>
+                  <p className="text-lg font-medium mb-2">No auctions available</p>
+                  <p className="text-muted-foreground mb-4">
+                    {searchQuery || selectedCategories.length > 0 || priceRange[0] > 0 || priceRange[1] < 5000
+                      ? 'No auctions found matching your criteria.'
+                      : 'There are no auctions listed yet. Check back soon!'}
+                  </p>
+                  {(searchQuery || selectedCategories.length > 0 || priceRange[0] > 0 || priceRange[1] < 5000) && (
+                    <Button 
+                      variant="link" 
+                      onClick={() => {
+                        setSearchQuery('');
+                        setPriceRange([0, 5000]);
+                        setSelectedCategories([]);
+                      }}
+                    >
+                      Clear all filters
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ) : (
