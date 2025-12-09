@@ -6,99 +6,832 @@
   <title>BuyMe API Documentation</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; color: #333; line-height: 1.6; max-width: 1200px; margin: 0 auto; }
     h1 { color: #2563eb; margin-bottom: 10px; font-size: 28px; }
-    h2 { color: #1e40af; margin: 30px 0 15px; font-size: 20px; border-bottom: 2px solid #2563eb; padding-bottom: 5px; }
+    h2 { color: #1e40af; margin: 40px 0 20px; font-size: 22px; border-bottom: 2px solid #2563eb; padding-bottom: 8px; }
+    h3 { color: #1e3a5f; margin: 25px 0 12px; font-size: 16px; }
     .subtitle { color: #666; margin-bottom: 30px; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-    th { background-color: #2563eb; color: white; }
-    tr:nth-child(even) { background-color: #f8fafc; }
-    .method { font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+    .endpoint-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .endpoint-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .method { font-weight: bold; padding: 6px 12px; border-radius: 4px; font-size: 12px; text-transform: uppercase; }
     .get { background-color: #22c55e; color: white; }
     .post { background-color: #3b82f6; color: white; }
     .put { background-color: #f59e0b; color: white; }
     .delete { background-color: #ef4444; color: white; }
-    code { background-color: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; }
+    .endpoint-path { font-family: 'Courier New', monospace; font-size: 14px; color: #1e40af; font-weight: 600; }
+    .description { color: #64748b; margin-bottom: 15px; }
+    .params-section { margin-top: 15px; }
+    .params-title { font-weight: 600; color: #475569; font-size: 13px; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    table { width: 100%; border-collapse: collapse; margin-bottom: 10px; font-size: 13px; }
+    th, td { border: 1px solid #e2e8f0; padding: 10px 12px; text-align: left; }
+    th { background-color: #f1f5f9; color: #475569; font-weight: 600; }
+    tr:nth-child(even) { background-color: #fafafa; }
+    code { background-color: #e2e8f0; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 12px; }
+    .required { color: #ef4444; font-weight: 600; }
+    .optional { color: #22c55e; }
+    .type { color: #7c3aed; font-style: italic; }
     .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 12px; }
-    @media print { body { padding: 20px; } h2 { page-break-after: avoid; } table { page-break-inside: avoid; } }
+    .toc { background: #f1f5f9; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+    .toc h3 { margin-bottom: 10px; }
+    .toc ul { list-style: none; columns: 2; }
+    .toc a { color: #2563eb; text-decoration: none; }
+    .toc a:hover { text-decoration: underline; }
+    .example { background: #1e293b; color: #e2e8f0; padding: 12px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; overflow-x: auto; margin-top: 10px; }
+    @media print { 
+      body { padding: 20px; } 
+      h2 { page-break-after: avoid; } 
+      .endpoint-card { page-break-inside: avoid; }
+    }
+    @media (max-width: 768px) {
+      .toc ul { columns: 1; }
+    }
   </style>
 </head>
 <body>
   <h1>BuyMe Auction Platform - API Documentation</h1>
-  <p class="subtitle">Base URL: <code>http://localhost:8081</code></p>
+  <p class="subtitle">Base URL: <code>http://localhost:8081</code> | Version: 1.0</p>
 
-  <h2>Authentication</h2>
-  <table>
-    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
-    <tr><td><span class="method post">POST</span></td><td><code>/api/auth/login</code></td><td>Authenticate user and return JWT token</td></tr>
-    <tr><td><span class="method post">POST</span></td><td><code>/api/auth/register</code></td><td>Register new user account</td></tr>
-    <tr><td><span class="method post">POST</span></td><td><code>/api/auth/logout</code></td><td>Invalidate user session</td></tr>
-  </table>
+  <div class="toc">
+    <h3>Table of Contents</h3>
+    <ul>
+      <li><a href="#auth">Authentication</a></li>
+      <li><a href="#auctions">Auctions</a></li>
+      <li><a href="#bids">Bids</a></li>
+      <li><a href="#categories">Categories</a></li>
+      <li><a href="#users">Users</a></li>
+      <li><a href="#requests">Customer Requests</a></li>
+      <li><a href="#admin">Admin</a></li>
+      <li><a href="#alerts">Alerts</a></li>
+    </ul>
+  </div>
 
-  <h2>Auctions</h2>
-  <table>
-    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/auctions</code></td><td>List auctions with optional filters (search, categoryId, minPrice, maxPrice, status, sortBy, sortOrder, page, pageSize)</td></tr>
-    <tr><td><span class="method post">POST</span></td><td><code>/api/auctions</code></td><td>Create new auction listing</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/auctions/featured</code></td><td>Get featured/highlighted auctions</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/auctions/:id</code></td><td>Get auction details by ID</td></tr>
-    <tr><td><span class="method put">PUT</span></td><td><code>/api/auctions/:id</code></td><td>Update auction details</td></tr>
-    <tr><td><span class="method delete">DELETE</span></td><td><code>/api/auctions/:id</code></td><td>Delete auction listing</td></tr>
-  </table>
+  <!-- AUTHENTICATION -->
+  <h2 id="auth">Authentication</h2>
 
-  <h2>Bids</h2>
-  <table>
-    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/bids</code></td><td>List all bids</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/auctions/:auctionId/bids</code></td><td>Get all bids for a specific auction</td></tr>
-    <tr><td><span class="method post">POST</span></td><td><code>/api/auctions/:auctionId/bids</code></td><td>Place a bid on auction (supports auto-bidding)</td></tr>
-  </table>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/auth/login</span>
+    </div>
+    <p class="description">Authenticate user and return JWT token</p>
+    <div class="params-section">
+      <p class="params-title">Request Body</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>email</code></td><td class="type">string</td><td class="required">Yes</td><td>User's email address</td></tr>
+        <tr><td><code>password</code></td><td class="type">string</td><td class="required">Yes</td><td>User's password</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>token</code></td><td class="type">string</td><td>JWT authentication token</td></tr>
+        <tr><td><code>user</code></td><td class="type">User</td><td>User object with id, email, name, role</td></tr>
+      </table>
+    </div>
+  </div>
 
-  <h2>Categories</h2>
-  <table>
-    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/categories</code></td><td>Get hierarchical category tree</td></tr>
-  </table>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/auth/register</span>
+    </div>
+    <p class="description">Register new user account</p>
+    <div class="params-section">
+      <p class="params-title">Request Body</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>email</code></td><td class="type">string</td><td class="required">Yes</td><td>User's email address</td></tr>
+        <tr><td><code>password</code></td><td class="type">string</td><td class="required">Yes</td><td>Password (min 8 characters)</td></tr>
+        <tr><td><code>name</code></td><td class="type">string</td><td class="required">Yes</td><td>User's full name</td></tr>
+        <tr><td><code>role</code></td><td class="type">string</td><td class="optional">No</td><td>Role: 'buyer' | 'seller' (default: 'buyer')</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>token</code></td><td class="type">string</td><td>JWT authentication token</td></tr>
+        <tr><td><code>user</code></td><td class="type">User</td><td>Created user object</td></tr>
+      </table>
+    </div>
+  </div>
 
-  <h2>Users</h2>
-  <table>
-    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/users</code></td><td>List all users (admin only)</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:id</code></td><td>Get user profile by ID</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:userId/alerts</code></td><td>Get user's saved alerts</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:userId/auctions</code></td><td>Get auctions created by user</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:userId/bids</code></td><td>Get bids placed by user</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/users/:userId/orders</code></td><td>Get user's won auctions/orders</td></tr>
-  </table>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/auth/logout</span>
+    </div>
+    <p class="description">Invalidate user session</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>message</code></td><td class="type">string</td><td>Success confirmation message</td></tr>
+      </table>
+    </div>
+  </div>
 
-  <h2>Customer Requests</h2>
-  <table>
-    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/requests</code></td><td>List all customer requests (customer-rep/admin)</td></tr>
-    <tr><td><span class="method post">POST</span></td><td><code>/api/requests</code></td><td>Create new support request</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/requests/:id</code></td><td>Get request details by ID</td></tr>
-    <tr><td><span class="method put">PUT</span></td><td><code>/api/requests/:id</code></td><td>Update/resolve customer request</td></tr>
-  </table>
+  <!-- AUCTIONS -->
+  <h2 id="auctions">Auctions</h2>
 
-  <h2>Admin</h2>
-  <table>
-    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/admin/sales-report</code></td><td>Get sales analytics and reports</td></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/admin/audit-logs</code></td><td>Get system audit logs</td></tr>
-    <tr><td><span class="method post">POST</span></td><td><code>/api/admin/customer-reps</code></td><td>Create customer representative account</td></tr>
-  </table>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/auctions</span>
+    </div>
+    <p class="description">List auctions with optional filters and pagination</p>
+    <div class="params-section">
+      <p class="params-title">Query Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>search</code></td><td class="type">string</td><td class="optional">No</td><td>Search term for title/description</td></tr>
+        <tr><td><code>categoryId</code></td><td class="type">string</td><td class="optional">No</td><td>Filter by category ID</td></tr>
+        <tr><td><code>minPrice</code></td><td class="type">number</td><td class="optional">No</td><td>Minimum current bid price</td></tr>
+        <tr><td><code>maxPrice</code></td><td class="type">number</td><td class="optional">No</td><td>Maximum current bid price</td></tr>
+        <tr><td><code>status</code></td><td class="type">string</td><td class="optional">No</td><td>'active' | 'closed' | 'sold'</td></tr>
+        <tr><td><code>sortBy</code></td><td class="type">string</td><td class="optional">No</td><td>'endTime' | 'currentBid' | 'createdAt'</td></tr>
+        <tr><td><code>sortOrder</code></td><td class="type">string</td><td class="optional">No</td><td>'asc' | 'desc' (default: 'desc')</td></tr>
+        <tr><td><code>page</code></td><td class="type">number</td><td class="optional">No</td><td>Page number (default: 1)</td></tr>
+        <tr><td><code>pageSize</code></td><td class="type">number</td><td class="optional">No</td><td>Items per page (default: 12)</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>auctions</code></td><td class="type">AuctionItem[]</td><td>Array of auction items</td></tr>
+        <tr><td><code>total</code></td><td class="type">number</td><td>Total count of matching auctions</td></tr>
+        <tr><td><code>page</code></td><td class="type">number</td><td>Current page number</td></tr>
+        <tr><td><code>pageSize</code></td><td class="type">number</td><td>Items per page</td></tr>
+      </table>
+    </div>
+  </div>
 
-  <h2>Alerts</h2>
-  <table>
-    <tr><th>Method</th><th>Endpoint</th><th>Description</th></tr>
-    <tr><td><span class="method get">GET</span></td><td><code>/api/alerts</code></td><td>List all alerts</td></tr>
-    <tr><td><span class="method post">POST</span></td><td><code>/api/alerts</code></td><td>Create new alert with keywords/filters</td></tr>
-    <tr><td><span class="method delete">DELETE</span></td><td><code>/api/alerts/:id</code></td><td>Delete an alert</td></tr>
-  </table>
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/auctions</span>
+    </div>
+    <p class="description">Create new auction listing</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Request Body</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>title</code></td><td class="type">string</td><td class="required">Yes</td><td>Auction item title</td></tr>
+        <tr><td><code>description</code></td><td class="type">string</td><td class="required">Yes</td><td>Detailed item description</td></tr>
+        <tr><td><code>imageUrl</code></td><td class="type">string</td><td class="required">Yes</td><td>URL of item image</td></tr>
+        <tr><td><code>categoryId</code></td><td class="type">string</td><td class="required">Yes</td><td>Category ID for the item</td></tr>
+        <tr><td><code>categoryPath</code></td><td class="type">string[]</td><td class="required">Yes</td><td>Hierarchical category path</td></tr>
+        <tr><td><code>startingPrice</code></td><td class="type">number</td><td class="required">Yes</td><td>Starting bid price</td></tr>
+        <tr><td><code>bidIncrement</code></td><td class="type">number</td><td class="required">Yes</td><td>Minimum bid increment</td></tr>
+        <tr><td><code>minimumPrice</code></td><td class="type">number</td><td class="required">Yes</td><td>Secret reserve price</td></tr>
+        <tr><td><code>startTime</code></td><td class="type">ISO8601</td><td class="required">Yes</td><td>Auction start date/time</td></tr>
+        <tr><td><code>endTime</code></td><td class="type">ISO8601</td><td class="required">Yes</td><td>Auction end date/time</td></tr>
+        <tr><td><code>specifications</code></td><td class="type">object</td><td class="optional">No</td><td>Key-value specs (e.g., brand, model)</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns created AuctionItem object with generated id, sellerId, sellerName, currentBid, status</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/auctions/featured</span>
+    </div>
+    <p class="description">Get featured/highlighted auctions for homepage</p>
+    <div class="params-section">
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns array of AuctionItem objects (typically 4-8 items)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/auctions/:id</span>
+    </div>
+    <p class="description">Get auction details by ID</p>
+    <div class="params-section">
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td class="required">Yes</td><td>Auction ID</td></tr>
+      </table>
+      <p class="params-title">Response: AuctionItem Object</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td>Unique auction identifier</td></tr>
+        <tr><td><code>title</code></td><td class="type">string</td><td>Auction item title</td></tr>
+        <tr><td><code>description</code></td><td class="type">string</td><td>Detailed description</td></tr>
+        <tr><td><code>imageUrl</code></td><td class="type">string</td><td>Item image URL</td></tr>
+        <tr><td><code>categoryId</code></td><td class="type">string</td><td>Category ID</td></tr>
+        <tr><td><code>categoryPath</code></td><td class="type">string[]</td><td>Category hierarchy</td></tr>
+        <tr><td><code>sellerId</code></td><td class="type">string</td><td>Seller's user ID</td></tr>
+        <tr><td><code>sellerName</code></td><td class="type">string</td><td>Seller's display name</td></tr>
+        <tr><td><code>startingPrice</code></td><td class="type">number</td><td>Initial starting price</td></tr>
+        <tr><td><code>currentBid</code></td><td class="type">number</td><td>Current highest bid</td></tr>
+        <tr><td><code>bidIncrement</code></td><td class="type">number</td><td>Minimum bid increment</td></tr>
+        <tr><td><code>minimumPrice</code></td><td class="type">number</td><td>Secret reserve price</td></tr>
+        <tr><td><code>startTime</code></td><td class="type">ISO8601</td><td>Auction start time</td></tr>
+        <tr><td><code>endTime</code></td><td class="type">ISO8601</td><td>Auction end time</td></tr>
+        <tr><td><code>status</code></td><td class="type">string</td><td>'active' | 'closed' | 'sold'</td></tr>
+        <tr><td><code>specifications</code></td><td class="type">object</td><td>Optional key-value specs</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method put">PUT</span>
+      <span class="endpoint-path">/api/auctions/:id</span>
+    </div>
+    <p class="description">Update auction details (seller only, before bids placed)</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td class="required">Yes</td><td>Auction ID</td></tr>
+      </table>
+      <p class="params-title">Request Body (all fields optional)</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>title</code></td><td class="type">string</td><td>Updated title</td></tr>
+        <tr><td><code>description</code></td><td class="type">string</td><td>Updated description</td></tr>
+        <tr><td><code>imageUrl</code></td><td class="type">string</td><td>Updated image URL</td></tr>
+        <tr><td><code>endTime</code></td><td class="type">ISO8601</td><td>Extended end time</td></tr>
+        <tr><td><code>specifications</code></td><td class="type">object</td><td>Updated specifications</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method delete">DELETE</span>
+      <span class="endpoint-path">/api/auctions/:id</span>
+    </div>
+    <p class="description">Delete auction listing (seller only, before bids placed)</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td class="required">Yes</td><td>Auction ID to delete</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- BIDS -->
+  <h2 id="bids">Bids</h2>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/bids</span>
+    </div>
+    <p class="description">List all bids (admin/customer-rep only)</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns array of Bid objects</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/auctions/:auctionId/bids</span>
+    </div>
+    <p class="description">Get all bids for a specific auction</p>
+    <div class="params-section">
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>auctionId</code></td><td class="type">string</td><td class="required">Yes</td><td>Auction ID</td></tr>
+      </table>
+      <p class="params-title">Response: Bid Object Array</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td>Unique bid identifier</td></tr>
+        <tr><td><code>auctionId</code></td><td class="type">string</td><td>Associated auction ID</td></tr>
+        <tr><td><code>bidderId</code></td><td class="type">string</td><td>Bidder's user ID</td></tr>
+        <tr><td><code>bidderName</code></td><td class="type">string</td><td>Bidder's display name</td></tr>
+        <tr><td><code>amount</code></td><td class="type">number</td><td>Bid amount</td></tr>
+        <tr><td><code>isAutoBid</code></td><td class="type">boolean</td><td>Whether this is an auto-bid</td></tr>
+        <tr><td><code>timestamp</code></td><td class="type">ISO8601</td><td>When bid was placed</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/auctions/:auctionId/bids</span>
+    </div>
+    <p class="description">Place a bid on auction (supports auto-bidding)</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>auctionId</code></td><td class="type">string</td><td class="required">Yes</td><td>Auction ID to bid on</td></tr>
+      </table>
+      <p class="params-title">Request Body</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>amount</code></td><td class="type">number</td><td class="required">Yes</td><td>Bid amount (must exceed current + increment)</td></tr>
+        <tr><td><code>isAutoBid</code></td><td class="type">boolean</td><td class="required">Yes</td><td>Enable automatic bidding</td></tr>
+        <tr><td><code>maxAutoBid</code></td><td class="type">number</td><td class="optional">No*</td><td>Maximum auto-bid limit (*required if isAutoBid=true)</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns created Bid object</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <h2 id="categories">Categories</h2>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/categories</span>
+    </div>
+    <p class="description">Get hierarchical category tree</p>
+    <div class="params-section">
+      <p class="params-title">Response: Category Object Array</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td>Unique category identifier</td></tr>
+        <tr><td><code>name</code></td><td class="type">string</td><td>Category display name</td></tr>
+        <tr><td><code>parentId</code></td><td class="type">string?</td><td>Parent category ID (null for root)</td></tr>
+        <tr><td><code>children</code></td><td class="type">Category[]</td><td>Nested child categories</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <h2 id="users">Users</h2>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/users</span>
+    </div>
+    <p class="description">List all users (admin only)</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token} (admin role required)</td></tr>
+      </table>
+      <p class="params-title">Response: User Object Array</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td>Unique user identifier</td></tr>
+        <tr><td><code>email</code></td><td class="type">string</td><td>User's email address</td></tr>
+        <tr><td><code>name</code></td><td class="type">string</td><td>User's display name</td></tr>
+        <tr><td><code>role</code></td><td class="type">string</td><td>'buyer' | 'seller' | 'customer-rep' | 'admin'</td></tr>
+        <tr><td><code>isAnonymous</code></td><td class="type">boolean</td><td>Whether user is anonymous</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/users/:id</span>
+    </div>
+    <p class="description">Get user profile by ID</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td class="required">Yes</td><td>User ID</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns User object</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/users/:userId/alerts</span>
+    </div>
+    <p class="description">Get user's saved alerts</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>userId</code></td><td class="type">string</td><td class="required">Yes</td><td>User ID</td></tr>
+      </table>
+      <p class="params-title">Response: Alert Object Array</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td>Alert identifier</td></tr>
+        <tr><td><code>userId</code></td><td class="type">string</td><td>Owner user ID</td></tr>
+        <tr><td><code>keywords</code></td><td class="type">string[]</td><td>Search keywords</td></tr>
+        <tr><td><code>categoryIds</code></td><td class="type">string[]</td><td>Category filters</td></tr>
+        <tr><td><code>minPrice</code></td><td class="type">number?</td><td>Minimum price filter</td></tr>
+        <tr><td><code>maxPrice</code></td><td class="type">number?</td><td>Maximum price filter</td></tr>
+        <tr><td><code>specifications</code></td><td class="type">object?</td><td>Spec filters</td></tr>
+        <tr><td><code>isActive</code></td><td class="type">boolean</td><td>Alert enabled status</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/users/:userId/auctions</span>
+    </div>
+    <p class="description">Get auctions created by user</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>userId</code></td><td class="type">string</td><td class="required">Yes</td><td>User ID</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns array of AuctionItem objects created by user</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/users/:userId/bids</span>
+    </div>
+    <p class="description">Get bids placed by user</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>userId</code></td><td class="type">string</td><td class="required">Yes</td><td>User ID</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns array of Bid objects placed by user</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/users/:userId/orders</span>
+    </div>
+    <p class="description">Get user's won auctions/orders</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>userId</code></td><td class="type">string</td><td class="required">Yes</td><td>User ID</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns array of AuctionItem objects won by user (status='sold')</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- CUSTOMER REQUESTS -->
+  <h2 id="requests">Customer Requests</h2>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/requests</span>
+    </div>
+    <p class="description">List all customer requests (customer-rep/admin only)</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token} (customer-rep or admin role)</td></tr>
+      </table>
+      <p class="params-title">Response: CustomerRequest Object Array</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td>Request identifier</td></tr>
+        <tr><td><code>userId</code></td><td class="type">string</td><td>Requesting user's ID</td></tr>
+        <tr><td><code>userName</code></td><td class="type">string</td><td>Requesting user's name</td></tr>
+        <tr><td><code>type</code></td><td class="type">string</td><td>'password_reset' | 'bid_removal' | 'account_issue' | 'general'</td></tr>
+        <tr><td><code>status</code></td><td class="type">string</td><td>'pending' | 'in_progress' | 'resolved'</td></tr>
+        <tr><td><code>description</code></td><td class="type">string</td><td>Request description</td></tr>
+        <tr><td><code>createdAt</code></td><td class="type">ISO8601</td><td>Creation timestamp</td></tr>
+        <tr><td><code>resolvedAt</code></td><td class="type">ISO8601?</td><td>Resolution timestamp</td></tr>
+        <tr><td><code>assignedRepId</code></td><td class="type">string?</td><td>Assigned rep's user ID</td></tr>
+        <tr><td><code>auctionId</code></td><td class="type">string?</td><td>Related auction (for bid removal)</td></tr>
+        <tr><td><code>bidId</code></td><td class="type">string?</td><td>Related bid (for bid removal)</td></tr>
+        <tr><td><code>resolution</code></td><td class="type">string?</td><td>Resolution notes</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/requests</span>
+    </div>
+    <p class="description">Create new support request</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Request Body</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>type</code></td><td class="type">string</td><td class="required">Yes</td><td>'password_reset' | 'bid_removal' | 'account_issue' | 'general'</td></tr>
+        <tr><td><code>description</code></td><td class="type">string</td><td class="required">Yes</td><td>Detailed request description</td></tr>
+        <tr><td><code>auctionId</code></td><td class="type">string</td><td class="optional">No*</td><td>Auction ID (*required for bid_removal)</td></tr>
+        <tr><td><code>bidId</code></td><td class="type">string</td><td class="optional">No*</td><td>Bid ID (*required for bid_removal)</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns created CustomerRequest object</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/requests/:id</span>
+    </div>
+    <p class="description">Get request details by ID</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td class="required">Yes</td><td>Request ID</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns CustomerRequest object</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method put">PUT</span>
+      <span class="endpoint-path">/api/requests/:id</span>
+    </div>
+    <p class="description">Update/resolve customer request (customer-rep/admin only)</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token} (customer-rep or admin role)</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td class="required">Yes</td><td>Request ID</td></tr>
+      </table>
+      <p class="params-title">Request Body</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>status</code></td><td class="type">string</td><td class="optional">No</td><td>'pending' | 'in_progress' | 'resolved'</td></tr>
+        <tr><td><code>assignedRepId</code></td><td class="type">string</td><td class="optional">No</td><td>Assign to customer rep</td></tr>
+        <tr><td><code>resolution</code></td><td class="type">string</td><td class="optional">No*</td><td>Resolution notes (*required when status='resolved')</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ADMIN -->
+  <h2 id="admin">Admin</h2>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/admin/sales-report</span>
+    </div>
+    <p class="description">Get sales analytics and reports</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token} (admin role required)</td></tr>
+      </table>
+      <p class="params-title">Response: SalesReport Object</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>totalEarnings</code></td><td class="type">number</td><td>Total platform earnings</td></tr>
+        <tr><td><code>earningsByItem</code></td><td class="type">array</td><td>[{ itemId, itemName, earnings }]</td></tr>
+        <tr><td><code>earningsByItemType</code></td><td class="type">array</td><td>[{ category, earnings }]</td></tr>
+        <tr><td><code>earningsByUser</code></td><td class="type">array</td><td>[{ userId, userName, earnings }]</td></tr>
+        <tr><td><code>bestSellingItems</code></td><td class="type">array</td><td>[{ itemId, itemName, soldCount }]</td></tr>
+        <tr><td><code>bestSellingUsers</code></td><td class="type">array</td><td>[{ userId, userName, totalSales }]</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/admin/audit-logs</span>
+    </div>
+    <p class="description">Get system audit logs</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token} (admin role required)</td></tr>
+      </table>
+      <p class="params-title">Response: AuditLog Object Array</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td>Log entry identifier</td></tr>
+        <tr><td><code>userId</code></td><td class="type">string</td><td>User who performed action</td></tr>
+        <tr><td><code>userName</code></td><td class="type">string</td><td>User's display name</td></tr>
+        <tr><td><code>action</code></td><td class="type">string</td><td>Action performed</td></tr>
+        <tr><td><code>details</code></td><td class="type">string</td><td>Action details</td></tr>
+        <tr><td><code>timestamp</code></td><td class="type">ISO8601</td><td>When action occurred</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/admin/customer-reps</span>
+    </div>
+    <p class="description">Create customer representative account</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token} (admin role required)</td></tr>
+      </table>
+      <p class="params-title">Request Body</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>email</code></td><td class="type">string</td><td class="required">Yes</td><td>Rep's email address</td></tr>
+        <tr><td><code>password</code></td><td class="type">string</td><td class="required">Yes</td><td>Initial password</td></tr>
+        <tr><td><code>name</code></td><td class="type">string</td><td class="required">Yes</td><td>Rep's full name</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns created User object with role='customer-rep'</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <h2 id="alerts">Alerts</h2>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method get">GET</span>
+      <span class="endpoint-path">/api/alerts</span>
+    </div>
+    <p class="description">List all alerts (admin only)</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token} (admin role required)</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns array of Alert objects</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method post">POST</span>
+      <span class="endpoint-path">/api/alerts</span>
+    </div>
+    <p class="description">Create new alert with keywords/filters</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Request Body</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>keywords</code></td><td class="type">string[]</td><td class="required">Yes</td><td>Search keywords to match</td></tr>
+        <tr><td><code>categoryIds</code></td><td class="type">string[]</td><td class="optional">No</td><td>Category IDs to filter</td></tr>
+        <tr><td><code>minPrice</code></td><td class="type">number</td><td class="optional">No</td><td>Minimum price threshold</td></tr>
+        <tr><td><code>maxPrice</code></td><td class="type">number</td><td class="optional">No</td><td>Maximum price threshold</td></tr>
+        <tr><td><code>specifications</code></td><td class="type">object</td><td class="optional">No</td><td>Key-value spec filters</td></tr>
+        <tr><td><code>isActive</code></td><td class="type">boolean</td><td class="optional">No</td><td>Enable alert (default: true)</td></tr>
+      </table>
+      <p class="params-title">Response</p>
+      <table>
+        <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        <tr><td colspan="3">Returns created Alert object with generated id and userId</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="endpoint-card">
+    <div class="endpoint-header">
+      <span class="method delete">DELETE</span>
+      <span class="endpoint-path">/api/alerts/:id</span>
+    </div>
+    <p class="description">Delete an alert</p>
+    <div class="params-section">
+      <p class="params-title">Headers</p>
+      <table>
+        <tr><th>Header</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>Authorization</code></td><td class="required">Yes</td><td>Bearer {token}</td></tr>
+      </table>
+      <p class="params-title">Path Parameters</p>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr>
+        <tr><td><code>id</code></td><td class="type">string</td><td class="required">Yes</td><td>Alert ID to delete</td></tr>
+      </table>
+    </div>
+  </div>
 
   <div class="footer">
-    <p>Generated for BuyMe Auction Platform | API Version 1.0</p>
+    <p>Generated for BuyMe Auction Platform | API Version 1.0 | Last Updated: December 2024</p>
   </div>
 </body>
 </html>
