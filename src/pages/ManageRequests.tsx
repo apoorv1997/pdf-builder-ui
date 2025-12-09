@@ -9,11 +9,11 @@ import { dummyRequests } from '@/data/dummyData';
 import { Loader2, AlertCircle, Inbox, UserCheck } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CustomerRequest } from '@/types/auction';
+import { CustomerRequest, isCustomerRepRole } from '@/types/auction';
 
 const ManageRequests = () => {
   const user = userService.getCurrentUser();
-  const isCustomerRep = user?.role === 'customer-rep';
+  const isCustomerRep = isCustomerRepRole(user?.role);
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ['allRequests', isCustomerRep ? user?.id : null],
