@@ -60,9 +60,33 @@ const CreateAuction = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    const categoryIdNum = parseInt(formData.categoryId, 10);
+    if (isNaN(categoryIdNum)) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please select a category.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
+    const startingPrice = parseFloat(formData.startingPrice);
+    const bidIncrement = parseFloat(formData.bidIncrement);
+    const minimumPrice = parseFloat(formData.minimumPrice);
+    
+    if (isNaN(startingPrice) || isNaN(bidIncrement) || isNaN(minimumPrice)) {
+      toast({
+        title: 'Validation Error',
+        description: 'Please enter valid prices.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    
     setIsLoading(true);
 
-    const categoryIdNum = parseInt(formData.categoryId, 10);
     const selectedCategory = allCategories.find(c => c.id === categoryIdNum);
     
     try {
@@ -74,9 +98,9 @@ const CreateAuction = () => {
         categoryName: selectedCategory?.name.split(' > ').pop() || 'Electronics',
         sellerId: user?.id || '1',
         sellerName: user?.name || 'Unknown Seller',
-        startingPrice: parseFloat(formData.startingPrice),
-        bidIncrement: parseFloat(formData.bidIncrement),
-        minimumPrice: parseFloat(formData.minimumPrice),
+        startingPrice,
+        bidIncrement,
+        minimumPrice,
         startTime: new Date(),
         endTime: endDate,
         specifications: formData.specifications 
