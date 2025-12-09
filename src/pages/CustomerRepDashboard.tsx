@@ -23,8 +23,9 @@ const CustomerRepDashboard = () => {
     },
   });
 
-  const pending = data?.requests.filter(r => r.status === 'pending') || [];
-  const inProgress = data?.requests.filter(r => r.status === 'in_progress') || [];
+  const requests = data?.requests ?? [];
+  const pending = requests.filter(r => r.status === 'pending');
+  const inProgress = requests.filter(r => r.status === 'in_progress');
 
   return (
     <div className="min-h-screen bg-background">
@@ -74,15 +75,19 @@ const CustomerRepDashboard = () => {
               <Loader2 className="h-6 w-6 animate-spin mx-auto" />
             ) : (
               <div className="space-y-3">
-                {data?.requests.slice(0, 5).map((req) => (
-                  <Link key={req.id} to={`/request/${req.id}`} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-smooth">
-                    <div>
-                      <p className="font-medium">{req.userName}</p>
-                      <p className="text-sm text-muted-foreground">{req.type.replace('_', ' ')}</p>
-                    </div>
-                    <Badge variant={req.status === 'pending' ? 'destructive' : 'secondary'}>{req.status}</Badge>
-                  </Link>
-                ))}
+                {requests.length === 0 ? (
+                  <p className="text-muted-foreground text-center py-4">No requests found</p>
+                ) : (
+                  requests.slice(0, 5).map((req) => (
+                    <Link key={req.id} to={`/request/${req.id}`} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-smooth">
+                      <div>
+                        <p className="font-medium">{req.userName}</p>
+                        <p className="text-sm text-muted-foreground">{req.type.replace('_', ' ')}</p>
+                      </div>
+                      <Badge variant={req.status === 'pending' ? 'destructive' : 'secondary'}>{req.status}</Badge>
+                    </Link>
+                  ))
+                )}
               </div>
             )}
           </CardContent>
