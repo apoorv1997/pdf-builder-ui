@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Gavel, Loader2, Mail, Lock } from 'lucide-react';
-import { userService } from '@/api';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -14,31 +14,25 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      await userService.login({ email, password });
+      await login(email, password);
       toast({
         title: 'Welcome back!',
         description: 'You have successfully logged in.',
       });
       navigate('/dashboard');
     } catch (error) {
-      // Fallback for demo without backend
-      localStorage.setItem('user', JSON.stringify({ 
-        id: '1', 
-        email, 
-        name: 'Demo User', 
-        role: 'buyer' 
-      }));
       toast({
-        title: 'Demo Mode',
-        description: 'Logged in with demo account (API not available).',
+        title: 'Error',
+        description: 'Failed to log in. Please try again.',
+        variant: 'destructive',
       });
-      navigate('/dashboard');
     } finally {
       setIsLoading(false);
     }

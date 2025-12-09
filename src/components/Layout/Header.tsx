@@ -1,7 +1,7 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, Bell, User, Gavel, Menu, HelpCircle } from 'lucide-react';
+import { Search, Bell, User, Gavel, Menu, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,14 +12,20 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Badge } from '@/components/ui/badge';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { UserRole } from '@/types/auction';
+import { useAuth } from '@/contexts/AuthContext';
 
-interface HeaderProps {
-  userRole?: UserRole;
-  userName?: string;
-}
+export const Header = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  const userRole = user?.role;
+  const userName = user?.name;
 
-export const Header = ({ userRole, userName }: HeaderProps) => {
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   const navLinks = [
     { to: '/browse', label: 'Browse' },
     ...(userRole ? [{ to: '/dashboard', label: 'Dashboard' }] : []),
@@ -107,8 +113,9 @@ export const Header = ({ userRole, userName }: HeaderProps) => {
                     <Link to="/settings">Settings</Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/login">Logout</Link>
+                  <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

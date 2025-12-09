@@ -28,7 +28,7 @@ const CustomerRepDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole="customer-rep" userName={user?.name} />
+      <Header />
       <div className="container py-8">
         <h1 className="text-4xl font-bold mb-8">Customer Rep Dashboard</h1>
         

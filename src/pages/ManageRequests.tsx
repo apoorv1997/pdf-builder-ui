@@ -44,7 +44,7 @@ const ManageRequests = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole={user?.role} userName={user?.name} />
+      <Header />
       <div className="container py-8">
         <h1 className="text-4xl font-bold mb-8">Manage Requests</h1>
         {isLoading ? <Loader2 className="h-8 w-8 animate-spin mx-auto" /> : (

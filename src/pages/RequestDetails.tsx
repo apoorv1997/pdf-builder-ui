@@ -106,7 +106,7 @@ const RequestDetails = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header userRole={user?.role} userName={user?.name} />
+        <Header />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -117,7 +117,7 @@ const RequestDetails = () => {
   if (!request) {
     return (
       <div className="min-h-screen bg-background">
-        <Header userRole={user?.role} userName={user?.name} />
+        <Header />
         <div className="container py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Request not found</h1>
           <Button asChild>
@@ -130,7 +130,7 @@ const RequestDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole={user?.role} userName={user?.name} />
+      <Header />
 
       <div className="container py-8 max-w-3xl">
         <Button variant="ghost" asChild className="mb-6">

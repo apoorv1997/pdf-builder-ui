@@ -23,7 +23,7 @@ const OrderHistory = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole={user?.role} userName={user?.name} />
+      <Header />
 
       <div className="container py-8">
         <h1 className="text-4xl font-bold mb-2">Order History</h1>

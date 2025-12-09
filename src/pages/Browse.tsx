@@ -41,7 +41,7 @@ const Browse = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole="buyer" userName="John Doe" />
+      <Header />
 
       <div className="container py-8">
         <div className="mb-8">

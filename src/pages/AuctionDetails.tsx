@@ -90,7 +90,7 @@ const AuctionDetails = () => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background">
-        <Header userRole={user?.role} userName={user?.name} />
+        <Header />
         <div className="flex items-center justify-center py-24">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
@@ -101,7 +101,7 @@ const AuctionDetails = () => {
   if (!auction) {
     return (
       <div className="min-h-screen bg-background">
-        <Header userRole={user?.role} userName={user?.name} />
+        <Header />
         <div className="container py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">Auction not found</h1>
           <Button asChild>
@@ -122,7 +122,7 @@ const AuctionDetails = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header userRole={user?.role} userName={user?.name} />
+      <Header />
 
       <div className="container py-8">
         {/* Breadcrumb */}
