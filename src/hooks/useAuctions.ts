@@ -57,9 +57,10 @@ export const useAuctions = (filters?: {
         }
         
         if (filters?.categoryId) {
+          const catId = parseInt(filters.categoryId, 10);
           filtered = filtered.filter(a => 
-            a.categoryId === filters.categoryId || 
-            a.categoryPath.some(c => c.toLowerCase().includes(filters.categoryId!.toLowerCase()))
+            a.categoryId === catId || 
+            a.categoryName.toLowerCase().includes(filters.categoryId!.toLowerCase())
           );
         }
         
