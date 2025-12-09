@@ -4,20 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { Gavel, Loader2, Mail, Lock } from 'lucide-react';
+import { Gavel, Loader2, Mail, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
   const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
 
     try {
@@ -27,12 +30,9 @@ const Login = () => {
         description: 'You have successfully logged in.',
       });
       navigate('/dashboard');
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to log in. Please try again.',
-        variant: 'destructive',
-      });
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Invalid email or password. Please try again.';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -50,6 +50,12 @@ const Login = () => {
           <CardDescription>Sign in to your account to continue</CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
