@@ -38,7 +38,7 @@ const AuctionDetails = () => {
 
   // Fetch similar items based on category
   const { data: similarData } = useAuctions({
-    categoryId: auction?.categoryId,
+    categoryId: auction?.categoryId?.toString(),
     status: 'active',
   });
 
@@ -159,7 +159,7 @@ const AuctionDetails = () => {
           <div className="space-y-6">
             <div>
               <p className="text-sm text-muted-foreground mb-2">
-                {auction.categoryPath.join(' > ')}
+                {auction.categoryName}
               </p>
               <h1 className="text-3xl font-bold mb-4">{auction.title}</h1>
               <p className="text-muted-foreground">{auction.description}</p>

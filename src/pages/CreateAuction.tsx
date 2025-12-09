@@ -37,7 +37,7 @@ const CreateAuction = () => {
 
   // Flatten categories for dropdown - memoized for performance
   const allCategories = useMemo(() => {
-    const flattenCategories = (cats: typeof categories, parentPath: string[] = []): { id: string; name: string; path: string[] }[] => {
+    const flattenCategories = (cats: typeof categories, parentPath: string[] = []): { id: number; name: string; path: string[] }[] => {
       if (!cats) return [];
       return cats.flatMap(cat => {
         const currentPath = [...parentPath, cat.name];
@@ -54,22 +54,24 @@ const CreateAuction = () => {
   // Get selected category name
   const selectedCategoryName = useMemo(() => {
     if (!formData.categoryId) return null;
-    return allCategories.find(c => c.id === formData.categoryId)?.name || formData.categoryId;
+    const catId = parseInt(formData.categoryId, 10);
+    return allCategories.find(c => c.id === catId)?.name || formData.categoryId;
   }, [formData.categoryId, allCategories]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    const selectedCategory = allCategories.find(c => c.id === formData.categoryId);
+    const categoryIdNum = parseInt(formData.categoryId, 10);
+    const selectedCategory = allCategories.find(c => c.id === categoryIdNum);
     
     try {
       await auctionService.createAuction({
         title: formData.title,
         description: formData.description,
         imageUrl: formData.imageUrl || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800',
-        categoryId: formData.categoryId,
-        categoryPath: selectedCategory?.path || ['Electronics'],
+        categoryId: categoryIdNum,
+        categoryName: selectedCategory?.name.split(' > ').pop() || 'Electronics',
         sellerId: user?.id || '1',
         sellerName: user?.name || 'Unknown Seller',
         startingPrice: parseFloat(formData.startingPrice),
@@ -166,7 +168,7 @@ const CreateAuction = () => {
                   </SelectTrigger>
                   <SelectContent>
                     {allCategories.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id}>
+                      <SelectItem key={cat.id} value={cat.id.toString()}>
                         {cat.name}
                       </SelectItem>
                     ))}

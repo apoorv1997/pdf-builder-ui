@@ -49,7 +49,7 @@ export const AuctionCard = ({ auction }: AuctionCardProps) => {
           </h3>
         </Link>
         <p className="text-xs text-muted-foreground">
-          {auction.categoryPath.join(' > ')}
+          {auction.categoryName}
         </p>
       </CardHeader>
 

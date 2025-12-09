@@ -14,7 +14,7 @@ import { SlidersHorizontal, Loader2, Search } from 'lucide-react';
 const Browse = () => {
   const [priceRange, setPriceRange] = useState([0, 5000]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState<'endTime' | 'currentBid' | 'createdAt'>('endTime');
 
   const { data: categories } = useCategories();
@@ -22,7 +22,7 @@ const Browse = () => {
     search: searchQuery || undefined,
     minPrice: priceRange[0] || undefined,
     maxPrice: priceRange[1] || undefined,
-    categoryId: selectedCategories.length === 1 ? selectedCategories[0] : undefined,
+    categoryId: selectedCategories.length === 1 ? selectedCategories[0].toString() : undefined,
     sortBy,
   });
 
@@ -31,7 +31,7 @@ const Browse = () => {
     ...(cat.children?.map(sub => ({ id: sub.id, name: `${cat.name} > ${sub.name}` })) || [])
   ]) || [];
 
-  const toggleCategory = (categoryId: string) => {
+  const toggleCategory = (categoryId: number) => {
     setSelectedCategories(prev =>
       prev.includes(categoryId)
         ? prev.filter(id => id !== categoryId)
@@ -97,11 +97,11 @@ const Browse = () => {
                     {allSubcategories.map((category) => (
                       <div key={category.id} className="flex items-center space-x-2">
                         <Checkbox
-                          id={category.id}
+                          id={`cat-${category.id}`}
                           checked={selectedCategories.includes(category.id)}
                           onCheckedChange={() => toggleCategory(category.id)}
                         />
-                        <Label htmlFor={category.id} className="text-sm cursor-pointer">
+                        <Label htmlFor={`cat-${category.id}`} className="text-sm cursor-pointer">
                           {category.name}
                         </Label>
                       </div>

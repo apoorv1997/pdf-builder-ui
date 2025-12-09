@@ -21,7 +21,7 @@ const Preferences = () => {
 
   const [newAlert, setNewAlert] = useState({
     keywords: '',
-    categoryIds: [] as string[],
+    categoryIds: [] as number[],
     minPrice: '',
     maxPrice: '',
   });
@@ -77,7 +77,7 @@ const Preferences = () => {
     ...(cat.children?.map(sub => ({ id: sub.id, name: sub.name })) || [])
   ]) || [];
 
-  const toggleCategory = (catId: string) => {
+  const toggleCategory = (catId: number) => {
     setNewAlert(prev => ({
       ...prev,
       categoryIds: prev.categoryIds.includes(catId)

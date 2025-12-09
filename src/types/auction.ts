@@ -9,9 +9,9 @@ export interface User {
 }
 
 export interface Category {
-  id: string;
+  id: number;
   name: string;
-  parentId?: string;
+  parentId?: number;
   children?: Category[];
 }
 
@@ -20,8 +20,8 @@ export interface AuctionItem {
   title: string;
   description: string;
   imageUrl: string;
-  categoryId: string;
-  categoryPath: string[];
+  categoryId: number;
+  categoryName: string;
   sellerId: string;
   sellerName: string;
   startingPrice: number;
@@ -49,7 +49,7 @@ export interface Alert {
   id: string;
   userId: string;
   keywords: string[];
-  categoryIds: string[];
+  categoryIds: number[];
   minPrice?: number;
   maxPrice?: number;
   specifications?: Record<string, string>;
