@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Header } from '@/components/Layout/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,20 +35,27 @@ const CreateAuction = () => {
   });
   const [endDate, setEndDate] = useState<Date>(addDays(new Date(), 7));
 
-  // Flatten categories for dropdown
-  const flattenCategories = (cats: typeof categories, parentPath: string[] = []): { id: string; name: string; path: string[] }[] => {
-    if (!cats) return [];
-    return cats.flatMap(cat => {
-      const currentPath = [...parentPath, cat.name];
-      const displayName = parentPath.length > 0 ? `${parentPath.join(' > ')} > ${cat.name}` : cat.name;
-      return [
-        { id: cat.id, name: displayName, path: currentPath },
-        ...flattenCategories(cat.children, currentPath)
-      ];
-    });
-  };
-  
-  const allCategories = flattenCategories(categories);
+  // Flatten categories for dropdown - memoized for performance
+  const allCategories = useMemo(() => {
+    const flattenCategories = (cats: typeof categories, parentPath: string[] = []): { id: string; name: string; path: string[] }[] => {
+      if (!cats) return [];
+      return cats.flatMap(cat => {
+        const currentPath = [...parentPath, cat.name];
+        const displayName = parentPath.length > 0 ? `${parentPath.join(' > ')} > ${cat.name}` : cat.name;
+        return [
+          { id: cat.id, name: displayName, path: currentPath },
+          ...flattenCategories(cat.children, currentPath)
+        ];
+      });
+    };
+    return flattenCategories(categories);
+  }, [categories]);
+
+  // Get selected category name
+  const selectedCategoryName = useMemo(() => {
+    if (!formData.categoryId) return null;
+    return allCategories.find(c => c.id === formData.categoryId)?.name || formData.categoryId;
+  }, [formData.categoryId, allCategories]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,11 +159,9 @@ const CreateAuction = () => {
                   value={formData.categoryId} 
                   onValueChange={(v) => setFormData({ ...formData, categoryId: v })}
                 >
-                  <SelectTrigger>
-                    <span className="truncate">
-                      {formData.categoryId 
-                        ? allCategories.find(c => c.id === formData.categoryId)?.name 
-                        : "Select a category"}
+                  <SelectTrigger className="w-full">
+                    <span className={cn("truncate", !formData.categoryId && "text-muted-foreground")}>
+                      {selectedCategoryName || "Select a category"}
                     </span>
                   </SelectTrigger>
                   <SelectContent>
