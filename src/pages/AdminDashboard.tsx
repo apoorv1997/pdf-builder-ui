@@ -320,14 +320,14 @@ const AdminDashboard = () => {
                       <AlertTitle>Error</AlertTitle>
                       <AlertDescription>Failed to load sales data</AlertDescription>
                     </Alert>
-                  ) : salesReport?.earningsByItemType?.length === 0 ? (
+                  ) : !salesReport?.earningsByItemType?.length ? (
                     <div className="flex flex-col items-center py-8 text-muted-foreground">
                       <Inbox className="h-10 w-10 mb-2" />
                       <p>No category data available</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {salesReport?.earningsByItemType.map((item) => (
+                      {salesReport.earningsByItemType.map((item) => (
                         <div key={item.category} className="flex items-center justify-between">
                           <span className="font-medium">{item.category}</span>
                           <span className="text-success font-semibold">
@@ -359,14 +359,14 @@ const AdminDashboard = () => {
                       <AlertTitle>Error</AlertTitle>
                       <AlertDescription>Failed to load seller earnings</AlertDescription>
                     </Alert>
-                  ) : salesReport?.earningsByUser?.length === 0 ? (
+                  ) : !salesReport?.earningsByUser?.length ? (
                     <div className="flex flex-col items-center py-8 text-muted-foreground">
                       <Inbox className="h-10 w-10 mb-2" />
                       <p>No seller earnings data</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
-                      {salesReport?.earningsByUser.map((user) => (
+                      {salesReport.earningsByUser.map((user) => (
                         <div key={user.userId} className="flex items-center justify-between">
                           <span className="font-medium">{user.userName}</span>
                           <span className="text-primary font-semibold">
@@ -398,14 +398,14 @@ const AdminDashboard = () => {
                       <AlertTitle>Error</AlertTitle>
                       <AlertDescription>Failed to load best sellers</AlertDescription>
                     </Alert>
-                  ) : salesReport?.bestSellingItems?.length === 0 ? (
+                  ) : !salesReport?.bestSellingItems?.length ? (
                     <div className="flex flex-col items-center py-8 text-muted-foreground">
                       <Inbox className="h-10 w-10 mb-2" />
                       <p>No best selling items yet</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {salesReport?.bestSellingItems.map((item, i) => (
+                      {salesReport.bestSellingItems.map((item, i) => (
                         <div key={item.itemId} className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <span className="w-6 h-6 rounded-full bg-accent/10 flex items-center justify-center text-xs font-bold text-accent">
@@ -440,14 +440,14 @@ const AdminDashboard = () => {
                       <AlertTitle>Error</AlertTitle>
                       <AlertDescription>Failed to load top sellers</AlertDescription>
                     </Alert>
-                  ) : salesReport?.bestSellingUsers?.length === 0 ? (
+                  ) : !salesReport?.bestSellingUsers?.length ? (
                     <div className="flex flex-col items-center py-8 text-muted-foreground">
                       <Inbox className="h-10 w-10 mb-2" />
                       <p>No top sellers data</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {salesReport?.bestSellingUsers.map((seller, i) => (
+                      {salesReport.bestSellingUsers.map((seller, i) => (
                         <div key={seller.userId} className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
                             <span className="w-6 h-6 rounded-full bg-secondary/10 flex items-center justify-center text-xs font-bold text-secondary">
