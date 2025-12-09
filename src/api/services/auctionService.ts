@@ -30,6 +30,13 @@ export const auctionService = {
     return apiClient.get<AuctionItem[]>(API_ENDPOINTS.featuredAuctions);
   },
 
+  async searchAuctions(query: string, filters?: Omit<AuctionFilters, 'search'>): Promise<AuctionsResponse> {
+    return apiClient.get<AuctionsResponse>(API_ENDPOINTS.searchAuctions, { 
+      q: query, 
+      ...filters as Record<string, string | number | boolean | undefined> 
+    });
+  },
+
   async getAuctionById(id: string): Promise<AuctionItem> {
     return apiClient.get<AuctionItem>(API_ENDPOINTS.auctionById(id));
   },
