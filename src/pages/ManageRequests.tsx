@@ -33,9 +33,10 @@ const ManageRequests = () => {
     },
   });
 
-  const pending = data?.requests.filter(r => r.status === 'pending') || [];
-  const inProgress = data?.requests.filter(r => r.status === 'in_progress') || [];
-  const resolved = data?.requests.filter(r => r.status === 'resolved') || [];
+  const requests = data?.requests ?? [];
+  const pending = requests.filter(r => r.status === 'pending');
+  const inProgress = requests.filter(r => r.status === 'in_progress');
+  const resolved = requests.filter(r => r.status === 'resolved');
 
   const RequestList = ({ requests, emptyMessage }: { requests: CustomerRequest[]; emptyMessage: string }) => (
     requests.length === 0 ? (
