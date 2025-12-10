@@ -1,4 +1,4 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Header } from '@/components/Layout/Header';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { adminService, userService } from '@/api';
 import { dummyRequests } from '@/data/dummyData';
 import { ClipboardList, Loader2, ArrowRight, Users, CheckCircle } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
+import { isOpenStatus } from '@/types/auction';
 
 const CustomerRepDashboard = () => {
   const user = userService.getCurrentUser();
@@ -24,8 +24,9 @@ const CustomerRepDashboard = () => {
   });
 
   const requests = data?.requests ?? [];
-  const pending = requests.filter(r => r.status === 'pending');
-  const inProgress = requests.filter(r => r.status === 'in_progress');
+  const openRequests = requests.filter(r => isOpenStatus(r.status));
+  const inProgress = requests.filter(r => r.status.toLowerCase() === 'in_progress');
+  const resolved = requests.filter(r => r.status.toLowerCase() === 'resolved' || r.status.toLowerCase() === 'closed');
 
   return (
     <div className="min-h-screen bg-background">
@@ -37,8 +38,8 @@ const CustomerRepDashboard = () => {
           <Card className="shadow-card">
             <CardContent className="pt-6 flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Pending</p>
-                <p className="text-3xl font-bold">{pending.length}</p>
+                <p className="text-sm text-muted-foreground">Open</p>
+                <p className="text-3xl font-bold">{openRequests.length}</p>
               </div>
               <ClipboardList className="h-8 w-8 text-accent" />
             </CardContent>
@@ -55,8 +56,8 @@ const CustomerRepDashboard = () => {
           <Card className="shadow-card">
             <CardContent className="pt-6 flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Resolved Today</p>
-                <p className="text-3xl font-bold">5</p>
+                <p className="text-sm text-muted-foreground">Resolved</p>
+                <p className="text-3xl font-bold">{resolved.length}</p>
               </div>
               <CheckCircle className="h-8 w-8 text-success" />
             </CardContent>
@@ -81,10 +82,12 @@ const CustomerRepDashboard = () => {
                   requests.slice(0, 5).map((req) => (
                     <Link key={req.id} to={`/request/${req.id}`} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-smooth">
                       <div>
-                        <p className="font-medium">{req.userName}</p>
+                        <p className="font-medium">{req.subject || `Request #${req.id}`}</p>
                         <p className="text-sm text-muted-foreground">{req.type.replace('_', ' ')}</p>
                       </div>
-                      <Badge variant={req.status === 'pending' ? 'destructive' : 'secondary'}>{req.status}</Badge>
+                      <Badge variant={isOpenStatus(req.status) ? 'destructive' : 'secondary'}>
+                        {req.status}
+                      </Badge>
                     </Link>
                   ))
                 )}
