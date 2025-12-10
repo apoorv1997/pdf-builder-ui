@@ -22,7 +22,12 @@ export const adminService = {
   },
 
   async getRequests(params?: { status?: string; assignedRepId?: string; page?: number; pageSize?: number }): Promise<{ requests: CustomerRequest[]; total: number }> {
-    return apiClient.get<{ requests: CustomerRequest[]; total: number }>(API_ENDPOINTS.requests, params);
+    const response = await apiClient.get<CustomerRequest[] | { requests: CustomerRequest[]; total: number }>(API_ENDPOINTS.requests, params);
+    // Handle both array response and object response formats
+    if (Array.isArray(response)) {
+      return { requests: response, total: response.length };
+    }
+    return response;
   },
 
   async getRequestById(id: string): Promise<CustomerRequest> {
