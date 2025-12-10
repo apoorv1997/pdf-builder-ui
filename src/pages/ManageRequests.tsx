@@ -9,7 +9,7 @@ import { dummyRequests } from '@/data/dummyData';
 import { Loader2, AlertCircle, Inbox, UserCheck } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CustomerRequest, isCustomerRepRole } from '@/types/auction';
+import { CustomerRequest, isCustomerRepRole, isOpenStatus } from '@/types/auction';
 
 const ManageRequests = () => {
   const user = userService.getCurrentUser();
@@ -34,9 +34,9 @@ const ManageRequests = () => {
   });
 
   const requests = data?.requests ?? [];
-  const pending = requests.filter(r => r.status === 'pending');
-  const inProgress = requests.filter(r => r.status === 'in_progress');
-  const resolved = requests.filter(r => r.status === 'resolved');
+  const openRequests = requests.filter(r => isOpenStatus(r.status, r.resolution));
+  const inProgress = requests.filter(r => r.status.toLowerCase() === 'in_progress');
+  const resolved = requests.filter(r => !isOpenStatus(r.status, r.resolution) && r.status.toLowerCase() !== 'in_progress');
 
   const RequestList = ({ requests, emptyMessage }: { requests: CustomerRequest[]; emptyMessage: string }) => (
     requests.length === 0 ? (
@@ -104,16 +104,16 @@ const ManageRequests = () => {
             <AlertDescription>Failed to load customer requests. Please try again later.</AlertDescription>
           </Alert>
         ) : (
-          <Tabs defaultValue="pending">
+          <Tabs defaultValue="open">
             <TabsList className="mb-6">
-              <TabsTrigger value="pending">Pending ({pending.length})</TabsTrigger>
+              <TabsTrigger value="open">Open ({openRequests.length})</TabsTrigger>
               <TabsTrigger value="in_progress">In Progress ({inProgress.length})</TabsTrigger>
               <TabsTrigger value="resolved">Resolved ({resolved.length})</TabsTrigger>
             </TabsList>
-            <TabsContent value="pending">
+            <TabsContent value="open">
               <Card className="shadow-card">
                 <CardContent className="pt-6">
-                  <RequestList requests={pending} emptyMessage="No pending requests" />
+                  <RequestList requests={openRequests} emptyMessage="No open requests" />
                 </CardContent>
               </Card>
             </TabsContent>
