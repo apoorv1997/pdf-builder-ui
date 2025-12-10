@@ -15,48 +15,17 @@ import {
   Trophy,
   AlertTriangle
 } from 'lucide-react';
-import { useAuctions } from '@/hooks/useAuctions';
-import { userService, auctionService } from '@/api';
-import { useQuery } from '@tanstack/react-query';
-import { Bid, AuctionItem } from '@/types/auction';
-import { useMemo } from 'react';
-
-interface BidWithAuction extends Bid {
-  auction?: AuctionItem;
-  isWinning: boolean;
-}
+import { userService } from '@/api';
+import { useBidsWithStatus, BidWithAuction } from '@/hooks/useBidsWithStatus';
 
 const Dashboard = () => {
   const user = userService.getCurrentUser();
+  const { winning, outbid, all, isLoading } = useBidsWithStatus(user?.id);
 
-  const { data: userBids } = useQuery({
-    queryKey: ['userBids', user?.id],
-    queryFn: () => userService.getUserBids(user!.id),
-    enabled: !!user?.id,
-  });
-
-  const { data: auctionsData } = useAuctions();
-
-  // Combine bids with auction data and determine winning status
-  const bidsWithStatus = useMemo(() => {
-    if (!userBids || !auctionsData?.auctions) return { winning: [], outbid: [] };
-
-    const enrichedBids: BidWithAuction[] = userBids.map((bid) => {
-      const auction = auctionsData.auctions.find((a) => String(a.id) === String(bid.auctionId));
-      const isWinning = auction ? bid.amount >= auction.currentBid : false;
-      return { ...bid, auction, isWinning };
-    });
-
-    const winning = enrichedBids.filter((b) => b.isWinning && b.auction);
-    const outbid = enrichedBids.filter((b) => !b.isWinning && b.auction);
-
-    return { winning, outbid };
-  }, [userBids, auctionsData]);
-
-  const activeBidsCount = userBids?.length ?? 0;
+  const activeBidsCount = all?.length ?? 0;
 
   const stats = [
-    { label: 'Active Bids', value: String(activeBidsCount), icon: TrendingUp, color: 'text-primary' },
+    { label: 'Active Bids', value: String(winning.length + outbid.length), icon: TrendingUp, color: 'text-primary' },
     { label: 'Watching', value: '0', icon: Bell, color: 'text-accent' },
     { label: 'Won Auctions', value: '0', icon: Gavel, color: 'text-success' },
     { label: 'Ending Soon', value: '0', icon: Clock, color: 'text-destructive' },
@@ -180,12 +149,12 @@ const Dashboard = () => {
                   <Trophy className="h-4 w-4 text-success" />
                   <h3 className="font-semibold text-success">Winning Bids</h3>
                   <Badge variant="secondary" className="bg-success/10 text-success">
-                    {bidsWithStatus.winning.length}
+                    {winning.length}
                   </Badge>
                 </div>
-                {bidsWithStatus.winning.length > 0 ? (
+                {winning.length > 0 ? (
                   <div className="space-y-3">
-                    {bidsWithStatus.winning.slice(0, 2).map(renderBidItem)}
+                    {winning.slice(0, 2).map(renderBidItem)}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground py-2">No winning bids yet</p>
@@ -198,12 +167,12 @@ const Dashboard = () => {
                   <AlertTriangle className="h-4 w-4 text-destructive" />
                   <h3 className="font-semibold text-destructive">Outbid</h3>
                   <Badge variant="secondary" className="bg-destructive/10 text-destructive">
-                    {bidsWithStatus.outbid.length}
+                    {outbid.length}
                   </Badge>
                 </div>
-                {bidsWithStatus.outbid.length > 0 ? (
+                {outbid.length > 0 ? (
                   <div className="space-y-3">
-                    {bidsWithStatus.outbid.slice(0, 2).map(renderBidItem)}
+                    {outbid.slice(0, 2).map(renderBidItem)}
                   </div>
                 ) : (
                   <p className="text-sm text-muted-foreground py-2">No outbid items</p>
