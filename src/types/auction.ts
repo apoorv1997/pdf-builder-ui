@@ -74,23 +74,32 @@ export interface SalesReport {
 }
 
 export type RequestType = 'password_reset' | 'bid_removal' | 'account_issue' | 'general';
-export type RequestStatus = 'pending' | 'in_progress' | 'resolved';
+export type RequestStatus = 'open' | 'pending' | 'in_progress' | 'resolved' | 'closed';
+
+// Helper to check if status is open/pending (case-insensitive)
+export const isOpenStatus = (status: string): boolean => {
+  const normalized = status.toLowerCase();
+  return normalized === 'open' || normalized === 'pending';
+};
 
 export interface CustomerRequest {
-  id: string;
-  userId: string;
-  userName: string;
+  id: string | number;
+  userId: string | number;
+  userName?: string;
   type: RequestType;
+  subject?: string;
+  message?: string;
   status: RequestStatus;
-  description: string;
-  createdAt: Date;
-  resolvedAt?: Date;
+  description?: string;
+  createdAt: Date | string;
+  updatedAt?: Date | string;
+  resolvedAt?: Date | string;
   assignedRepId?: string;
   // For bid removal requests
   auctionId?: string;
   bidId?: string;
   // Resolution details
-  resolution?: string;
+  resolution?: string | null;
 }
 
 export interface AuditLog {
