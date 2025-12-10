@@ -76,9 +76,13 @@ export interface SalesReport {
 export type RequestType = 'password_reset' | 'bid_removal' | 'account_issue' | 'general';
 export type RequestStatus = 'open' | 'pending' | 'in_progress' | 'resolved' | 'closed';
 
-// Helper to check if status is open/pending (case-insensitive)
-export const isOpenStatus = (status: string): boolean => {
+// Helper to check if status is open/pending (case-insensitive) or resolution is null
+export const isOpenStatus = (status: string, resolution?: string | null): boolean => {
   const normalized = status.toLowerCase();
+  // If resolution is null/undefined, treat as open
+  if (resolution === null || resolution === undefined) {
+    return normalized !== 'resolved' && normalized !== 'closed';
+  }
   return normalized === 'open' || normalized === 'pending';
 };
 

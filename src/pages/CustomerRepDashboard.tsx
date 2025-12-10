@@ -24,9 +24,9 @@ const CustomerRepDashboard = () => {
   });
 
   const requests = data?.requests ?? [];
-  const openRequests = requests.filter(r => isOpenStatus(r.status));
+  const openRequests = requests.filter(r => isOpenStatus(r.status, r.resolution));
   const inProgress = requests.filter(r => r.status.toLowerCase() === 'in_progress');
-  const resolved = requests.filter(r => r.status.toLowerCase() === 'resolved' || r.status.toLowerCase() === 'closed');
+  const resolved = requests.filter(r => !isOpenStatus(r.status, r.resolution) && r.status.toLowerCase() !== 'in_progress');
 
   return (
     <div className="min-h-screen bg-background">
