@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import { adminService, userService } from '@/api';
 import { dummyRequests, dummyAuctions, dummyBids } from '@/data/dummyData';
-import { RequestStatus } from '@/types/auction';
+import { RequestStatus, isOpenStatus } from '@/types/auction';
 import { 
   ArrowLeft, 
   Loader2, 
@@ -78,15 +78,15 @@ const RequestDetails = () => {
     resolveMutation.mutate(action);
   };
 
-  const getStatusBadge = (status: RequestStatus) => {
-    switch (status) {
-      case 'pending':
-        return <Badge variant="destructive"><Clock className="h-3 w-3 mr-1" />Pending</Badge>;
-      case 'in_progress':
-        return <Badge className="bg-accent text-accent-foreground"><AlertCircle className="h-3 w-3 mr-1" />In Progress</Badge>;
-      case 'resolved':
-        return <Badge className="bg-success text-success-foreground"><CheckCircle className="h-3 w-3 mr-1" />Resolved</Badge>;
+  const getStatusBadge = (status: string, resolution?: string | null) => {
+    const normalized = status.toLowerCase();
+    if (isOpenStatus(status, resolution)) {
+      return <Badge variant="destructive"><Clock className="h-3 w-3 mr-1" />Open</Badge>;
     }
+    if (normalized === 'in_progress') {
+      return <Badge className="bg-accent text-accent-foreground"><AlertCircle className="h-3 w-3 mr-1" />In Progress</Badge>;
+    }
+    return <Badge className="bg-success text-success-foreground"><CheckCircle className="h-3 w-3 mr-1" />Resolved</Badge>;
   };
 
   const getTypeLabel = (type: string) => {
@@ -152,7 +152,7 @@ const RequestDetails = () => {
                   Submitted {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true })}
                 </p>
               </div>
-              {getStatusBadge(request.status)}
+              {getStatusBadge(request.status, request.resolution)}
             </div>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -162,7 +162,7 @@ const RequestDetails = () => {
                 <User className="h-6 w-6 text-primary" />
               </div>
               <div>
-                <p className="font-semibold">{request.userName}</p>
+                <p className="font-semibold">{request.userName || `User #${request.userId}`}</p>
                 <p className="text-sm text-muted-foreground">User ID: {request.userId}</p>
               </div>
             </div>
@@ -174,7 +174,12 @@ const RequestDetails = () => {
               <div className="flex items-center gap-2 mb-3">
                 <Badge variant="outline">{getTypeLabel(request.type)}</Badge>
               </div>
-              <p className="text-foreground whitespace-pre-wrap">{request.description}</p>
+              {request.subject && (
+                <h3 className="font-semibold text-lg mb-2">{request.subject}</h3>
+              )}
+              <p className="text-foreground whitespace-pre-wrap">
+                {request.message || request.description || 'No message provided'}
+              </p>
             </div>
 
             {/* Related Auction (for bid removal) */}
@@ -228,8 +233,8 @@ const RequestDetails = () => {
           </CardContent>
         </Card>
 
-        {/* Actions (only for pending/in_progress) */}
-        {request.status !== 'resolved' && (
+        {/* Actions (only for open/in_progress) */}
+        {isOpenStatus(request.status, request.resolution) || request.status.toLowerCase() === 'in_progress' ? (
           <Card className="shadow-card">
             <CardHeader>
               <CardTitle className="text-lg">Take Action</CardTitle>
@@ -288,7 +293,7 @@ const RequestDetails = () => {
               </Button>
             </CardContent>
           </Card>
-        )}
+        ) : null}
       </div>
     </div>
   );
